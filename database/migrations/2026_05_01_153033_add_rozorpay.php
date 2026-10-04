@@ -12,9 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->string('razorpay_order_id')->nullable()->after('order_number');
-            $table->string('razorpay_payment_id')->nullable()->after('razorpay_order_id');
-            $table->text('razorpay_signature')->nullable()->after('razorpay_payment_id');
+            if (!Schema::hasColumn('orders', 'razorpay_order_id')) {
+                $table->string('razorpay_order_id')->nullable()->after('order_number');
+            }
+            if (!Schema::hasColumn('orders', 'razorpay_payment_id')) {
+                $table->string('razorpay_payment_id')->nullable()->after('razorpay_order_id');
+            }
+            if (!Schema::hasColumn('orders', 'razorpay_signature')) {
+                $table->text('razorpay_signature')->nullable()->after('razorpay_payment_id');
+            }
         });
     }
 

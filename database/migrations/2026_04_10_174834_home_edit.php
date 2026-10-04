@@ -16,16 +16,16 @@ return new class extends Migration
             
             // Home Banner
 
-            $table->string('home_banner_subtitle');
-            $table->string('home_banner_title1');
-            $table->string('home_banner_title2');
-            $table->string('home_banner_color_title');
-            $table->string('home_banner_desc');
-            $table->string('home_banner_btn_text1');
-            $table->string('home_banner_btn_url1');
-            $table->string('home_banner_btn_text2');
-            $table->string('home_banner_btn_url2');
-            $table->string('home_banner_img');
+            $table->string('home_banner_subtitle')->nullable();
+            $table->string('home_banner_title1')->nullable();
+            $table->string('home_banner_title2')->nullable();
+            $table->string('home_banner_color_title')->nullable();
+            $table->string('home_banner_desc')->nullable();
+            $table->string('home_banner_btn_text1')->nullable();
+            $table->string('home_banner_btn_url1')->nullable();
+            $table->string('home_banner_btn_text2')->nullable();
+            $table->string('home_banner_btn_url2')->nullable();
+            $table->string('home_banner_img')->nullable();
 
         });
     }
