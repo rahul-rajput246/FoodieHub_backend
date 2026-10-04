@@ -57,3 +57,12 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## 
+
+DB_CONNECTION=pgsql
+DB_HOST=ep-rapid-wildflower-apq5yajq-pooler.c-7.us-east-1.aws.neon.tech
+DB_PORT=3306
+DB_DATABASE=neondb
+DB_USERNAME=neondb_owner
+DB_PASSWORD=npg_WIMRrO4v5uXn
