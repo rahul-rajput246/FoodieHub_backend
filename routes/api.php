@@ -40,6 +40,35 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/cart/add', [CartController::class, 'addToCart']);
     Route::post('/cart/update/{id}', [CartController::class, 'updateCart']);
     Route::delete('/cart/remove/{id}', [CartController::class, 'removeCartItem']);
+    Route::post('/cart/remove/{id}', [CartController::class, 'removeCartItem']);
+});
+
+Route::post('/login', function (Request $request) {
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required',
+    ]);
+
+    if (!Illuminate\Support\Facades\Auth::attempt($request->only('email', 'password'))) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Invalid credentials',
+        ], 401);
+    }
+
+    $request->session()->regenerate();
+    $user = Illuminate\Support\Facades\Auth::user();
+
+    return response()->json([
+        'success' => true,
+        'user' => [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'roles' => $user->getRoleNames(),
+        ],
+        'redirect' => '/admin/dashboard',
+    ]);
 });
 
 // Wishlist API Routes

@@ -52,13 +52,17 @@ class OrderController extends Controller
         return back()->with('error', 'Please add an address before placing an order.');
     }
 
-    $total = 0;
+    $subtotal = 0;
 
     foreach ($cartItems as $item) {
         if ($item->food) {
-            $total += $item->food->food_price * $item->quantity;
+            $subtotal += $item->food->food_price * $item->quantity;
         }
     }
+
+    $deliveryFee = $subtotal > 499 ? 0 : 40;
+    $discount = $subtotal > 999 ? 100 : 0;
+    $total = max(0, $subtotal + $deliveryFee - $discount);
 
     $order = Order::create([
         'user_id' => Auth::id(),
@@ -123,22 +127,26 @@ class OrderController extends Controller
             ], 422);
         }
 
-        $total = 0;
+        $subtotal = 0;
 
         foreach ($cart as $item) {
             $food = FoodItems::find($item['id']);
 
             if ($food) {
-                $total += $food->food_price * $item['qty'];
+                $subtotal += $food->food_price * $item['qty'];
             }
         }
+
+        $deliveryFee = $subtotal > 499 ? 0 : 40;
+        $discount = $subtotal > 999 ? 100 : 0;
+        $total = max(0, $subtotal + $deliveryFee - $discount);
 
         $order = Order::create([
             'user_id' => Auth::id(),
             'address_id' => $address->id,
             'order_number' => 'ORD-' . date('Y') . '-' . strtoupper(uniqid()),
             'total_amount' => $total,
-            'status' => 'Confirmed',
+            'status' => 'confirmed',
             'payment_method' => $request->payment_method,
             'payment_status' => 'pending',
             'notes' => $request->notes,
@@ -160,6 +168,8 @@ class OrderController extends Controller
                 'subtotal' => $food->food_price * $item['qty'],
             ]);
         }
+
+        CartItem::where('user_id', Auth::id())->delete();
 
         return response()->json([
             'success' => true,
@@ -265,15 +275,19 @@ class OrderController extends Controller
     }
 
     $cart = $request->cart;
-    $total = 0;
+    $subtotal = 0;
 
     foreach ($cart as $item) {
         $food = FoodItems::find($item['id']);
 
         if ($food) {
-            $total += $food->food_price * $item['qty'];
+            $subtotal += $food->food_price * $item['qty'];
         }
     }
+
+    $deliveryFee = $subtotal > 499 ? 0 : 40;
+    $discount = $subtotal > 999 ? 100 : 0;
+    $total = max(0, $subtotal + $deliveryFee - $discount);
 
     DB::beginTransaction();
 
@@ -384,6 +398,8 @@ public function verifyRazorpayPayment(Request $request)
         'payment_status' => 'paid',
         'status' => 'confirmed',
     ]);
+
+    CartItem::where('user_id', Auth::id())->delete();
 
     return response()->json([
         'success' => true,

@@ -82,15 +82,23 @@ class CartController extends Controller
     public function updateCart(Request $request, $id)
     {
         $request->validate([
-            'quantity' => 'required|integer|min:1',
+            'quantity' => 'required|integer|min:0',
         ]);
 
-        $cartItem = CartItem::where('id', $id)
-            ->where('user_id', Auth::id())
-            ->firstOrFail();
+        if ($request->quantity <= 0) {
+            return $this->removeCartItem($id);
+        }
 
-        $cartItem->quantity = $request->quantity;
-        $cartItem->save();
+        $cartItem = CartItem::where('user_id', Auth::id())
+            ->where(function ($q) use ($id) {
+                $q->where('id', $id)->orWhere('food_item_id', $id);
+            })
+            ->first();
+
+        if ($cartItem) {
+            $cartItem->quantity = $request->quantity;
+            $cartItem->save();
+        }
 
         return response()->json([
             'success' => true,
@@ -100,11 +108,15 @@ class CartController extends Controller
 
     public function removeCartItem($id)
     {
-        $cartItem = CartItem::where('id', $id)
-            ->where('user_id', Auth::id())
-            ->firstOrFail();
+        $cartItem = CartItem::where('user_id', Auth::id())
+            ->where(function ($q) use ($id) {
+                $q->where('id', $id)->orWhere('food_item_id', $id);
+            })
+            ->first();
 
-        $cartItem->delete();
+        if ($cartItem) {
+            $cartItem->delete();
+        }
 
         return response()->json([
             'success' => true,
