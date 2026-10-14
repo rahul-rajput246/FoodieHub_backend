@@ -13,6 +13,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ContactMessageController;
 
 Route::get('/', function () {
     return redirect('http://localhost:5173'); 
@@ -141,6 +142,12 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/orders/{id}/receipt', [OrderController::class, 'adminPrintReceipt'])->name('admin.orders.receipt');
     Route::get('/admin/orders/{id}/send-email', [OrderController::class, 'resendOrderMail'])->name('admin.orders.sendEmail');
     Route::post('/admin/orders/{id}/update', [OrderController::class, 'updateStatus'])->name('admin.orders.status');
+
+    // Contact Messages Management
+    Route::get('/admin/messages', [ContactMessageController::class, 'index'])->name('admin.messages.index');
+    Route::get('/admin/messages/{id}', [ContactMessageController::class, 'show'])->name('admin.messages.show');
+    Route::post('/admin/messages/{id}/status', [ContactMessageController::class, 'updateStatus'])->name('admin.messages.status');
+    Route::delete('/admin/messages/{id}', [ContactMessageController::class, 'destroy'])->name('admin.messages.destroy');
 });
 
 // Cart Route

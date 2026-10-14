@@ -12,7 +12,7 @@
         }
 
         body {
-            font-family: 'DejaVu Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             font-size: 12px;
             color: #1f2937;
             background: #ffffff;
@@ -357,9 +357,9 @@
                 <td>
                     <strong>{{ $item->food_name }}</strong>
                 </td>
-                <td class="text-right">₹{{ number_format($item->price, 2) }}</td>
+                <td class="text-right">Rs. {{ number_format($item->price, 2) }}</td>
                 <td class="text-center">{{ $item->quantity }}</td>
-                <td class="text-right">₹{{ number_format($item->subtotal, 2) }}</td>
+                <td class="text-right">Rs. {{ number_format($item->subtotal, 2) }}</td>
             </tr>
             @endforeach
         </tbody>
@@ -384,7 +384,7 @@
                 <table class="totals-table">
                     <tr>
                         <td class="label">Items Subtotal:</td>
-                        <td class="value">₹{{ number_format($calculatedSubtotal, 2) }}</td>
+                        <td class="value">Rs. {{ number_format($calculatedSubtotal, 2) }}</td>
                     </tr>
                     <tr>
                         <td class="label">Delivery Fee:</td>
@@ -392,19 +392,19 @@
                             @if($calculatedDeliveryFee == 0)
                                 <span style="color: #059669; font-weight: bold;">FREE</span>
                             @else
-                                ₹{{ number_format($calculatedDeliveryFee, 2) }}
+                                Rs. {{ number_format($calculatedDeliveryFee, 2) }}
                             @endif
                         </td>
                     </tr>
                     @if($calculatedDiscount > 0)
                     <tr>
                         <td class="label" style="color: #059669;">Special Discount:</td>
-                        <td class="value" style="color: #059669;">-₹{{ number_format($calculatedDiscount, 2) }}</td>
+                        <td class="value" style="color: #059669;">-Rs. {{ number_format($calculatedDiscount, 2) }}</td>
                     </tr>
                     @endif
                     <tr class="grand-total-row">
                         <td class="label" style="color: #111827;">Grand Total:</td>
-                        <td class="value" style="color: #ff7e00;">₹{{ number_format($order->total_amount, 2) }}</td>
+                        <td class="value" style="color: #ff7e00;">Rs. {{ number_format($order->total_amount, 2) }}</td>
                     </tr>
                 </table>
             </td>

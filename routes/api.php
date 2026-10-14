@@ -7,10 +7,13 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\ContactMessageController;
 
 Route::get('/home-data/{page}' , [HomeApiController::class , 'homeApi']);
 
 Route::get('/food-data' , [FoodItemsApiController::class , 'foodApi']);
+
+Route::post('/contact', [ContactMessageController::class, 'store']);
 
 // Admin Login Credentials Route
 
