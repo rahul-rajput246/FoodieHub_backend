@@ -41,16 +41,10 @@ class WishlistController extends Controller
 
         $food = FoodItems::findOrFail($request->food_item_id);
 
-        $existing = WishlistItem::where('user_id', Auth::id())
-            ->where('food_item_id', $food->id)
-            ->first();
-
-        if (!$existing) {
-            WishlistItem::create([
-                'user_id' => Auth::id(),
-                'food_item_id' => $food->id,
-            ]);
-        }
+        WishlistItem::firstOrCreate([
+            'user_id' => Auth::id(),
+            'food_item_id' => $food->id,
+        ]);
 
         return response()->json([
             'success' => true,
@@ -60,11 +54,16 @@ class WishlistController extends Controller
 
     public function removeWishlistItem($id)
     {
-        $wishlistItem = WishlistItem::where('id', $id)
-            ->where('user_id', Auth::id())
-            ->firstOrFail();
+        $wishlistItem = WishlistItem::where('user_id', Auth::id())
+            ->where(function ($query) use ($id) {
+                $query->where('id', $id)
+                    ->orWhere('food_item_id', $id);
+            })
+            ->first();
 
-        $wishlistItem->delete();
+        if ($wishlistItem) {
+            $wishlistItem->delete();
+        }
 
         return response()->json([
             'success' => true,
