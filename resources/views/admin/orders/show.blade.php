@@ -13,14 +13,31 @@
             </p>
         </div>
 
-        <div>
-            <a href="{{ route('admin.orders') }}" class="create_food_btn">← Back to Orders</a>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+            <a href="{{ route('admin.orders.sendEmail', $order->id) }}" class="create_food_btn" style="background: #8b5cf6;" onclick="return confirm('Send confirmation & invoice email to customer?')">
+                📧 Send Invoice Mail
+            </a>
+            <a href="{{ route('admin.orders.invoice', $order->id) }}" class="create_food_btn" style="background: #2563eb;">
+                📄 Download Invoice
+            </a>
+            <a href="{{ route('admin.orders.receipt', $order->id) }}" target="_blank" class="create_food_btn" style="background: #059669;">
+                🖨️ Print Receipt
+            </a>
+            <a href="{{ route('admin.orders') }}" class="create_food_btn" style="background: #374151;">
+                ← Back to Orders
+            </a>
         </div>
     </div>
 
     @if(session('success'))
         <div style="margin-bottom:20px; padding:12px; background:#d1fae5; color:#065f46; border-radius:8px;">
             {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div style="margin-bottom:20px; padding:12px; background:#fee2e2; color:#991b1b; border-radius:8px;">
+            {{ session('error') }}
         </div>
     @endif
 

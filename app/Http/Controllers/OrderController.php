@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\Auth;
 use Razorpay\Api\Api;
 use Illuminate\Support\Facades\DB;
 use App\Models\CartItem;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OrderSuccessMail;
 
 class OrderController extends Controller
 {
@@ -92,6 +95,9 @@ class OrderController extends Controller
 
     CartItem::where('user_id', Auth::id())->delete();
 
+    // Send order confirmation & invoice email
+    $this->sendOrderSuccessMail($order);
+
     return redirect()->route('orders.index')->with('success', 'Order placed successfully.');
 }
 
@@ -170,6 +176,9 @@ class OrderController extends Controller
         }
 
         CartItem::where('user_id', Auth::id())->delete();
+
+        // Send order confirmation & invoice email
+        $this->sendOrderSuccessMail($order);
 
         return response()->json([
             'success' => true,
@@ -401,10 +410,159 @@ public function verifyRazorpayPayment(Request $request)
 
     CartItem::where('user_id', Auth::id())->delete();
 
+    // Send order confirmation & invoice email
+    $this->sendOrderSuccessMail($order);
+
     return response()->json([
         'success' => true,
         'message' => 'Payment verified successfully',
         'order_id' => $order->id,
     ]);
 }
+
+    /**
+     * Calculate financial breakdown for invoices and receipts
+     */
+    protected function getOrderFinancials(Order $order): array
+    {
+        $calculatedSubtotal = 0;
+        foreach ($order->items as $item) {
+            $calculatedSubtotal += $item->subtotal;
+        }
+
+        $calculatedDeliveryFee = $calculatedSubtotal > 499 ? 0 : 40;
+        $calculatedDiscount = $calculatedSubtotal > 999 ? 100 : 0;
+
+        return [
+            'calculatedSubtotal' => $calculatedSubtotal,
+            'calculatedDeliveryFee' => $calculatedDeliveryFee,
+            'calculatedDiscount' => $calculatedDiscount,
+        ];
+    }
+
+    /**
+     * Customer: Download PDF invoice
+     */
+    public function downloadInvoice($id)
+    {
+        $order = Order::with('items.food', 'address', 'user')
+            ->where('id', $id);
+
+        if (!Auth::user()->hasRole('admin')) {
+            $order = $order->where('user_id', Auth::id());
+        }
+
+        $order = $order->firstOrFail();
+        $financials = $this->getOrderFinancials($order);
+
+        $pdf = Pdf::loadView('invoices.order-pdf', array_merge(['order' => $order], $financials));
+        $pdf->setPaper('a4', 'portrait');
+
+        return $pdf->download('FoodieHub-Invoice-' . $order->order_number . '.pdf');
+    }
+
+    /**
+     * Customer: View/Print thermal POS receipt
+     */
+    public function printReceipt($id)
+    {
+        $order = Order::with('items.food', 'address', 'user')
+            ->where('id', $id);
+
+        if (!Auth::user()->hasRole('admin')) {
+            $order = $order->where('user_id', Auth::id());
+        }
+
+        $order = $order->firstOrFail();
+        $financials = $this->getOrderFinancials($order);
+
+        return view('invoices.order-receipt', array_merge(['order' => $order], $financials));
+    }
+
+    /**
+     * Admin: Download PDF invoice for any order
+     */
+    public function adminDownloadInvoice($id)
+    {
+        $order = Order::with('items.food', 'address', 'user')
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $financials = $this->getOrderFinancials($order);
+
+        $pdf = Pdf::loadView('invoices.order-pdf', array_merge(['order' => $order], $financials));
+        $pdf->setPaper('a4', 'portrait');
+
+        return $pdf->download('FoodieHub-Invoice-' . $order->order_number . '.pdf');
+    }
+
+    /**
+     * Admin: View/Print POS thermal receipt for kitchen or counter
+     */
+    public function adminPrintReceipt($id)
+    {
+        $order = Order::with('items.food', 'address', 'user')
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $financials = $this->getOrderFinancials($order);
+
+        return view('invoices.order-receipt', array_merge(['order' => $order], $financials));
+    }
+
+    /**
+     * Send order confirmation and PDF invoice email
+     */
+    protected function sendOrderSuccessMail(Order $order): void
+    {
+        try {
+            $order->loadMissing('items.food', 'address', 'user');
+
+            $recipientEmail = $order->user->email ?? null;
+
+            if (!$recipientEmail) {
+                return;
+            }
+
+            $financials = $this->getOrderFinancials($order);
+
+            Mail::to($recipientEmail)->send(new OrderSuccessMail(
+                $order,
+                $financials['calculatedSubtotal'],
+                $financials['calculatedDeliveryFee'],
+                $financials['calculatedDiscount']
+            ));
+        } catch (\Throwable $e) {
+            \Log::error('Order confirmation email failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Admin: Manually trigger/resend confirmation & invoice email
+     */
+    public function resendOrderMail($id)
+    {
+        $order = Order::with('items.food', 'address', 'user')->findOrFail($id);
+
+        $recipientEmail = $order->user->email ?? null;
+
+        if (!$recipientEmail) {
+            return back()->with('error', 'User has no email address associated with this order.');
+        }
+
+        $financials = $this->getOrderFinancials($order);
+
+        try {
+            Mail::to($recipientEmail)->send(new OrderSuccessMail(
+                $order,
+                $financials['calculatedSubtotal'],
+                $financials['calculatedDeliveryFee'],
+                $financials['calculatedDiscount']
+            ));
+
+            return back()->with('success', 'Confirmation & invoice email has been sent successfully to ' . $recipientEmail);
+        } catch (\Throwable $e) {
+            return back()->with('error', 'Failed to send email: ' . $e->getMessage());
+        }
+    }
 }

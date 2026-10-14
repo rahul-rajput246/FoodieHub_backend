@@ -13,7 +13,13 @@
             </p>
         </div>
 
-        <div class="dashboard_header_right">
+        <div class="dashboard_header_right" style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="{{ route('orders.invoice', $order->id) }}" class="dashboard_top_btn" style="background: #2563eb;">
+                📄 Download Invoice
+            </a>
+            <a href="{{ route('orders.receipt', $order->id) }}" target="_blank" class="dashboard_top_btn" style="background: #059669;">
+                🖨️ Print Receipt
+            </a>
             <a href="{{ route('orders.index') }}" class="dashboard_top_btn" style="background: #374151;">← Back to Orders</a>
             <a href="http://localhost:5173/Menu" class="dashboard_top_btn">+ Order Again</a>
         </div>

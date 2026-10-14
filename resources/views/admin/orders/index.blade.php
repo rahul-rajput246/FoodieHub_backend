@@ -77,6 +77,12 @@
                                 <a href="{{ route('admin.orders.show', $order->id) }}" class="action_btn edit_btn">
                                     View Details
                                 </a>
+                                <a href="{{ route('admin.orders.invoice', $order->id) }}" title="Download PDF Invoice" class="action_btn edit_btn" style="background: #2563eb; color: #fff;">
+                                    PDF
+                                </a>
+                                <a href="{{ route('admin.orders.receipt', $order->id) }}" target="_blank" title="Print POS Receipt" class="action_btn edit_btn" style="background: #059669; color: #fff;">
+                                    Print
+                                </a>
                             </div>
                         </td>
                     </tr>

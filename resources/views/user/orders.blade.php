@@ -53,9 +53,14 @@
                             </td>
                             <td>{{ $order->payment_method ? strtoupper($order->payment_method) : 'N/A' }}</td>
                             <td>
-                                <a href="{{ route('orders.show', $order->id) }}" class="dashboard_top_btn" style="padding: 6px 14px; font-size: 13px;">
-                                    View Details
-                                </a>
+                                <div style="display: flex; gap: 6px; align-items: center;">
+                                    <a href="{{ route('orders.show', $order->id) }}" class="dashboard_top_btn" style="padding: 6px 12px; font-size: 13px;">
+                                        View Details
+                                    </a>
+                                    <a href="{{ route('orders.invoice', $order->id) }}" title="Download PDF Invoice" class="dashboard_top_btn" style="padding: 6px 10px; font-size: 13px; background: #2563eb;">
+                                        📄 PDF
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                         @endforeach

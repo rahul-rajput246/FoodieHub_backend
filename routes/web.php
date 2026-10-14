@@ -127,6 +127,8 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
+    Route::get('/orders/{id}/invoice', [OrderController::class, 'downloadInvoice'])->name('orders.invoice');
+    Route::get('/orders/{id}/receipt', [OrderController::class, 'printReceipt'])->name('orders.receipt');
     Route::post('/orders/store', [OrderController::class, 'store'])->name('orders.store');
 });
 
@@ -135,6 +137,9 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/orders', [OrderController::class, 'adminIndex'])->name('admin.orders');
     Route::get('/admin/orders/{id}', [OrderController::class, 'adminShow'])->name('admin.orders.show');
+    Route::get('/admin/orders/{id}/invoice', [OrderController::class, 'adminDownloadInvoice'])->name('admin.orders.invoice');
+    Route::get('/admin/orders/{id}/receipt', [OrderController::class, 'adminPrintReceipt'])->name('admin.orders.receipt');
+    Route::get('/admin/orders/{id}/send-email', [OrderController::class, 'resendOrderMail'])->name('admin.orders.sendEmail');
     Route::post('/admin/orders/{id}/update', [OrderController::class, 'updateStatus'])->name('admin.orders.status');
 });
 
