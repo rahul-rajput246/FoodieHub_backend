@@ -213,16 +213,22 @@ class OrderController extends Controller
         $request->validate([
             'status' => 'required|in:pending,confirmed,preparing,out_for_delivery,delivered,cancelled',
             'payment_status' => 'required|in:pending,paid,failed',
+            'driver_name' => 'nullable|string|max:100',
+            'driver_phone' => 'nullable|string|max:30',
+            'driver_vehicle' => 'nullable|string|max:150',
         ]);
 
         $order = Order::findOrFail($id);
 
         $order->status = $request->status;
         $order->payment_status = $request->payment_status;
+        $order->driver_name = $request->driver_name;
+        $order->driver_phone = $request->driver_phone;
+        $order->driver_vehicle = $request->driver_vehicle;
         $order->save();
 
         return redirect()->route('admin.orders.show', $order->id)
-            ->with('success', 'Order status updated successfully');
+            ->with('success', 'Order status & driver details updated successfully');
     }
 
     // Admin Pending Orders
@@ -687,13 +693,25 @@ public function verifyRazorpayPayment(Request $request)
 
         $deliveryPartner = null;
         if (in_array($order->status, ['preparing', 'out_for_delivery', 'delivered'])) {
-            $deliveryPartner = [
-                'name' => 'Amit Sharma',
-                'phone' => '+91 98765 43210',
-                'rating' => '4.9 ★',
-                'vehicle' => 'Electric Scooter (MH-02-EE-1234)',
-                'deliveries' => '1,420+ delivered',
-            ];
+            if (!empty($order->driver_name) && !empty($order->driver_phone)) {
+                $deliveryPartner = [
+                    'name' => $order->driver_name,
+                    'phone' => $order->driver_phone,
+                    'rating' => '4.9 ★',
+                    'vehicle' => $order->driver_vehicle ?: 'FoodieHub Express',
+                    'deliveries' => 'Assigned Driver',
+                    'is_assigned' => true,
+                ];
+            } else {
+                $deliveryPartner = [
+                    'name' => 'FoodieHub Restaurant Support',
+                    'phone' => '+91 6284229435',
+                    'rating' => '5.0 ★',
+                    'vehicle' => 'Official Restaurant Helpline',
+                    'deliveries' => 'Active Support',
+                    'is_assigned' => false,
+                ];
+            }
         }
 
         return response()->json([

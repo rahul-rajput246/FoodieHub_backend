@@ -163,6 +163,33 @@
                     @enderror
                 </div>
 
+                {{-- Driver Assignment Fields --}}
+                <div style="margin-top: 25px; padding-top: 20px; border-top: 1px dashed #e5e7eb; margin-bottom: 25px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 14px;">
+                        <h4 style="margin: 0; font-size: 15px; font-weight: 700; color: #111827;">🛵 Assign Delivery Partner (Optional)</h4>
+                        <span style="font-size: 12px; color: #6b7280; background: #f3f4f6; padding: 2px 8px; border-radius: 4px;">
+                            If unassigned, defaults to FoodieHub Support (+91 6284229435)
+                        </span>
+                    </div>
+
+                    <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 6px;">
+                            <label for="driver_name" style="font-size: 13px; font-weight: 600; color: #374151;">Driver Name</label>
+                            <input type="text" name="driver_name" id="driver_name" class="custom_select" value="{{ old('driver_name', $order->driver_name) }}" placeholder="e.g. Ramesh Kumar">
+                        </div>
+
+                        <div style="flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 6px;">
+                            <label for="driver_phone" style="font-size: 13px; font-weight: 600; color: #374151;">Driver Phone Number</label>
+                            <input type="text" name="driver_phone" id="driver_phone" class="custom_select" value="{{ old('driver_phone', $order->driver_phone) }}" placeholder="e.g. 9876543210">
+                        </div>
+
+                        <div style="flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 6px;">
+                            <label for="driver_vehicle" style="font-size: 13px; font-weight: 600; color: #374151;">Vehicle Details</label>
+                            <input type="text" name="driver_vehicle" id="driver_vehicle" class="custom_select" value="{{ old('driver_vehicle', $order->driver_vehicle) }}" placeholder="e.g. Honda Activa (CH-01-AB-1234)">
+                        </div>
+                    </div>
+                </div>
+
                 <button type="submit" class="create_food_btn">Update Order</button>
             </form>
         </div>

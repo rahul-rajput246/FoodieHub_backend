@@ -18,7 +18,10 @@ class Order extends Model
         'status',
         'payment_method',
         'payment_status',
-        'notes'
+        'notes',
+        'driver_name',
+        'driver_phone',
+        'driver_vehicle',
     ];
 
     // Relationship: Order belongs to User
