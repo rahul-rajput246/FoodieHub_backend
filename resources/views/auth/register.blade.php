@@ -9,6 +9,9 @@
 
     <form method="POST" action="{{ route('register') }}" class="auth-form-stack">
         @csrf
+        @if(request('redirect'))
+            <input type="hidden" name="redirect" value="{{ request('redirect') }}">
+        @endif
 
         <div class="auth-field-grid">
             <div class="auth-field">
@@ -88,6 +91,6 @@
 
     <div class="auth-switch">
         <span>Already have an account?</span>
-        <a href="{{ route('login') }}">Log in here</a>
+        <a href="{{ route('login') }}{{ request('redirect') ? '?redirect=' . urlencode(request('redirect')) : '' }}">Log in here</a>
     </div>
 @endsection

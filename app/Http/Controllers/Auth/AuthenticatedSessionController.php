@@ -30,6 +30,17 @@ class AuthenticatedSessionController extends Controller
 
         $user = $request->user();
 
+        $redirect = $request->input('redirect');
+        $validRedirect = null;
+        if ($redirect && (
+            str_starts_with($redirect, 'http://localhost:5173') ||
+            str_starts_with($redirect, 'http://127.0.0.1:5173') ||
+            str_starts_with($redirect, 'https://foodie-hub-alpha.vercel.app') ||
+            str_starts_with($redirect, '/')
+        )) {
+            $validRedirect = $redirect;
+        }
+
         if ($request->wantsJson()) {
             return response()->json([
                 'success' => true,
@@ -39,11 +50,11 @@ class AuthenticatedSessionController extends Controller
                     'email' => $user->email,
                     'roles' => $user->getRoleNames(),
                 ],
-                'redirect' => '/admin/dashboard',
+                'redirect' => $validRedirect ?: '/admin/dashboard',
             ]);
         }
 
-        return redirect('/admin/dashboard');
+        return $validRedirect ? redirect()->away($validRedirect) : redirect('/admin/dashboard');
     }
 
     /**

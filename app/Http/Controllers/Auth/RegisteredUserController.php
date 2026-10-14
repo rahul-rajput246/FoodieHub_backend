@@ -48,6 +48,16 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
+        $redirect = $request->input('redirect');
+        if ($redirect && (
+            str_starts_with($redirect, 'http://localhost:5173') ||
+            str_starts_with($redirect, 'http://127.0.0.1:5173') ||
+            str_starts_with($redirect, 'https://foodie-hub-alpha.vercel.app') ||
+            str_starts_with($redirect, '/')
+        )) {
+            return redirect()->away($redirect);
+        }
+
         return redirect('http://localhost:5173');
     }
 }

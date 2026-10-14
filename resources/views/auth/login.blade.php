@@ -25,6 +25,9 @@ fetch("http://localhost:8000/sanctum/csrf-cookie", {
 
     <form method="POST" action="{{ route('login') }}" class="auth-form-stack">
         @csrf
+        @if(request('redirect'))
+            <input type="hidden" name="redirect" value="{{ request('redirect') }}">
+        @endif
 
         <div class="auth-field">
             <label for="email" class="auth-label">{{ __('Email Address') }}</label>
@@ -80,7 +83,7 @@ fetch("http://localhost:8000/sanctum/csrf-cookie", {
 
     <div class="auth-switch">
         <span>New to FoodieHub?</span>
-        <a href="{{ route('register') }}">Create an account</a>
+        <a href="{{ route('register') }}{{ request('redirect') ? '?redirect=' . urlencode(request('redirect')) : '' }}">Create an account</a>
     </div>
 @endsection
 
