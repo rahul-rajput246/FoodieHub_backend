@@ -183,6 +183,7 @@ class OrderController extends Controller
         return response()->json([
             'success' => true,
             'order_id' => $order->id,
+            'order_number' => $order->order_number,
             'message' => 'Order placed successfully'
         ]);
     }
@@ -423,6 +424,7 @@ public function verifyRazorpayPayment(Request $request)
         'success' => true,
         'message' => 'Payment verified successfully',
         'order_id' => $order->id,
+        'order_number' => $order->order_number,
     ]);
 }
 
@@ -452,7 +454,13 @@ public function verifyRazorpayPayment(Request $request)
     public function downloadInvoice($id)
     {
         $order = Order::with('items.food', 'address', 'user')
-            ->where('id', $id);
+            ->where(function ($query) use ($id) {
+                if (is_numeric($id)) {
+                    $query->where('id', $id)->orWhere('order_number', $id);
+                } else {
+                    $query->where('order_number', $id);
+                }
+            });
 
         if (!Auth::user()->hasRole('admin')) {
             $order = $order->where('user_id', Auth::id());
@@ -577,20 +585,25 @@ public function verifyRazorpayPayment(Request $request)
      */
     public function getTrackingDetails($id)
     {
+        $id = trim($id);
+        $cleanId = ltrim($id, '#');
+
+        // Strictly block numeric IDs to prevent enumeration (IDOR attacks)
+        if (is_numeric($cleanId)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'For security and privacy reasons, tracking by numeric ID (1, 2, 3...) is disabled. Please enter your unique Order Number (e.g., ORD-2026-XXXXX) from your receipt or confirmation email.',
+            ], 403);
+        }
+
         $order = Order::with('items.food', 'address', 'user')
-            ->where(function ($query) use ($id) {
-                if (is_numeric($id)) {
-                    $query->where('id', $id)->orWhere('order_number', $id);
-                } else {
-                    $query->where('order_number', $id);
-                }
-            })
+            ->where('order_number', $cleanId)
             ->first();
 
         if (!$order) {
             return response()->json([
                 'success' => false,
-                'message' => 'Order not found with provided ID or Order Number.',
+                'message' => 'No order found with Order Number "' . htmlspecialchars($cleanId) . '". Please check your receipt or confirmation email.',
             ], 404);
         }
 
