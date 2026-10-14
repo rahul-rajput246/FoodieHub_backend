@@ -714,6 +714,41 @@ public function verifyRazorpayPayment(Request $request)
             }
         }
 
+        // Resolve GPS coordinates based on customer address
+        $cityName = strtolower($order->address->city ?? '');
+        $cityCoordinates = [
+            'chandigarh' => ['res_lat' => 30.7333, 'res_lng' => 76.8000, 'cust_lat' => 30.7510, 'cust_lng' => 76.7620],
+            'mohali'     => ['res_lat' => 30.7046, 'res_lng' => 76.7179, 'cust_lat' => 30.7180, 'cust_lng' => 76.6920],
+            'panchkula'  => ['res_lat' => 30.6942, 'res_lng' => 76.8606, 'cust_lat' => 30.6820, 'cust_lng' => 76.8420],
+            'delhi'      => ['res_lat' => 28.6139, 'res_lng' => 77.2090, 'cust_lat' => 28.6350, 'cust_lng' => 77.2250],
+            'mumbai'     => ['res_lat' => 19.0760, 'res_lng' => 72.8777, 'cust_lat' => 19.0950, 'cust_lng' => 72.8520],
+            'bangalore'  => ['res_lat' => 12.9716, 'res_lng' => 77.5946, 'cust_lat' => 12.9850, 'cust_lng' => 77.6200],
+        ];
+
+        $matchedCoords = $cityCoordinates['chandigarh'];
+        foreach ($cityCoordinates as $key => $coords) {
+            if (str_contains($cityName, $key)) {
+                $matchedCoords = $coords;
+                break;
+            }
+        }
+
+        $gpsData = [
+            'restaurant' => [
+                'lat' => $matchedCoords['res_lat'],
+                'lng' => $matchedCoords['res_lng'],
+                'name' => 'FoodieHub Central Kitchen',
+                'address' => 'Sector 26, ' . ($order->address->city ?? 'Chandigarh'),
+            ],
+            'destination' => [
+                'lat' => $matchedCoords['cust_lat'],
+                'lng' => $matchedCoords['cust_lng'],
+                'name' => $order->address ? $order->address->full_name : 'Customer Delivery Location',
+                'address' => $order->address ? ($order->address->address_line . ', ' . $order->address->city) : 'Customer Location',
+            ],
+            'status' => $order->status,
+        ];
+
         return response()->json([
             'success' => true,
             'order' => [
@@ -733,6 +768,7 @@ public function verifyRazorpayPayment(Request $request)
                 'created_at' => $order->created_at->format('d M Y, h:i A'),
                 'updated_at' => $order->updated_at->format('d M Y, h:i A'),
                 'delivery_partner' => $deliveryPartner,
+                'gps' => $gpsData,
                 'address' => $order->address ? [
                     'full_name' => $order->address->full_name,
                     'mobile' => $order->address->mobile,
