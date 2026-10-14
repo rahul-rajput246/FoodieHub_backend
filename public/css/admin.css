@@ -421,6 +421,18 @@
     font-weight: 300;
 }
 
+.order_info_grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.order_info_grid .allfood_table_box {
+    margin-bottom: 0;
+    white-space: normal;
+}
+
 .update_order_status {
     background: #fff;
     border-radius: 18px;
@@ -1410,6 +1422,10 @@ a.toggle_class {
     }
 
     .form_row_2 {
+        grid-template-columns: 1fr;
+    }   
+
+    .order_info_grid {
         grid-template-columns: 1fr;
     }   
 

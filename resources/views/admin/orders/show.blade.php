@@ -44,36 +44,38 @@
         </div>
     </div>
 
-    <div class="allfood_table_box" style="margin-bottom: 24px;">
-        <div class="box_title_row">
-            <h3>Customer Information</h3>
+    <div class="order_info_grid">
+        <div class="allfood_table_box">
+            <div class="box_title_row">
+                <h3>Customer Information</h3>
+            </div>
+
+            <div class="contact_det">
+                <p><b>Name:</b> {{ $order->user->name ?? 'N/A' }}</p>
+                <p><b>Email:</b> {{ $order->user->email ?? 'N/A' }}</p>
+                <p><b>Payment Method:</b> {{ strtoupper($order->payment_method ?? 'N/A') }}</p>
+                <p><b>Payment Status:</b> {{ ucfirst($order->payment_status) }}</p>
+                <p><b>Notes:</b> {{ $order->notes ?? 'No notes added' }}</p>
+                <p><b>Placed On:</b> {{ $order->created_at->format('d M Y, h:i A') }}</p>
+            </div>
         </div>
 
-        <div class="contact_det">
-            <p><b>Name:</b> {{ $order->user->name ?? 'N/A' }}</p>
-            <p><b>Email:</b> {{ $order->user->email ?? 'N/A' }}</p>
-            <p><b>Payment Method:</b> {{ strtoupper($order->payment_method ?? 'N/A') }}</p>
-            <p><b>Payment Status:</b> {{ ucfirst($order->payment_status) }}</p>
-            <p><b>Notes:</b> {{ $order->notes ?? 'No notes added' }}</p>
-            <p><b>Placed On:</b> {{ $order->created_at->format('d M Y, h:i A') }}</p>
-        </div>
-    </div>
+        <div class="allfood_table_box">
+            <div class="box_title_row">
+                <h3>Delivery Address</h3>
+            </div>
 
-    <div class="allfood_table_box" style="margin-bottom: 24px;">
-        <div class="box_title_row">
-            <h3>Delivery Address</h3>
-        </div>
-
-        <div class="contact_det">
-            @if($order->address)
-                <p>{{ $order->address->full_name ?? '' }}</p>
-                <p>{{ $order->address->mobile ?? '' }}</p>
-                <p>{{ $order->address->address_line  ?? '' }}</p>
-                <p>{{ $order->address->city ?? '' }}, {{ $order->address->state ?? '' }}</p>
-                <p>{{ $order->address->pincode ?? '' }}</p>
-            @else
-                <p>No address found.</p>
-            @endif
+            <div class="contact_det">
+                @if($order->address)
+                    <p>{{ $order->address->full_name ?? '' }}</p>
+                    <p>{{ $order->address->mobile ?? '' }}</p>
+                    <p>{{ $order->address->address_line  ?? '' }}</p>
+                    <p>{{ $order->address->city ?? '' }}, {{ $order->address->state ?? '' }}</p>
+                    <p>{{ $order->address->pincode ?? '' }}</p>
+                @else
+                    <p>No address found.</p>
+                @endif
+            </div>
         </div>
     </div>
 
