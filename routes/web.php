@@ -147,6 +147,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/messages', [ContactMessageController::class, 'index'])->name('admin.messages.index');
     Route::get('/admin/messages/{id}', [ContactMessageController::class, 'show'])->name('admin.messages.show');
     Route::post('/admin/messages/{id}/status', [ContactMessageController::class, 'updateStatus'])->name('admin.messages.status');
+    Route::post('/admin/messages/{id}/reply', [ContactMessageController::class, 'sendReply'])->name('admin.messages.reply');
     Route::delete('/admin/messages/{id}', [ContactMessageController::class, 'destroy'])->name('admin.messages.destroy');
 });
 

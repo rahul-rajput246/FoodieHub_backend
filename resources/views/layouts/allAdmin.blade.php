@@ -17,6 +17,16 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    <script>
+        // Unregister any stale service workers on localhost
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for (let r of registrations) {
+                    r.unregister();
+                }
+            });
+        }
+    </script>
 </head>
 
 <body>

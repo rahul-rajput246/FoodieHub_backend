@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ContactMessage;
 use App\Mail\AdminContactNotificationMail;
+use App\Mail\CustomerReplyMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
@@ -109,5 +110,33 @@ class ContactMessageController extends Controller
         $message->delete();
 
         return redirect()->route('admin.messages.index')->with('success', 'Message deleted successfully.');
+    }
+
+    /**
+     * Admin: Send an email reply directly to the customer
+     */
+    public function sendReply(Request $request, $id)
+    {
+        $request->validate([
+            'subject' => 'required|string|max:200',
+            'reply_message' => 'required|string|min:3|max:5000',
+        ]);
+
+        $message = ContactMessage::findOrFail($id);
+
+        try {
+            Mail::to($message->email)->send(new CustomerReplyMail(
+                $message,
+                $request->subject,
+                $request->reply_message
+            ));
+
+            $message->update(['status' => 'replied']);
+
+            return back()->with('success', 'Reply email has been sent successfully to ' . $message->email);
+        } catch (\Throwable $e) {
+            Log::error('Failed to send customer inquiry reply: ' . $e->getMessage());
+            return back()->with('error', 'Failed to send email: ' . $e->getMessage());
+        }
     }
 }

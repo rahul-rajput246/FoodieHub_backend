@@ -13,9 +13,12 @@
             </p>
         </div>
 
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <a href="mailto:{{ $message->email }}?subject=Re:%20Inquiry%20at%20FoodieHub" class="create_food_btn" style="background: #2563eb;">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+            <button type="button" class="create_food_btn" style="background: #2563eb; border: none; cursor: pointer;" onclick="openReplyModal()">
                 ✉️ Reply via Email
+            </button>
+            <a href="https://mail.google.com/mail/?view=cm&fs=1&to={{ urlencode($message->email) }}&su={{ urlencode('Re: Your Inquiry at FoodieHub') }}&body={{ urlencode("Hello " . $message->name . ",\n\nThank you for reaching out to FoodieHub!\n\nRegarding your message:\n\"" . \Illuminate\Support\Str::limit($message->message, 120) . "\"\n\n") }}" target="_blank" rel="noopener noreferrer" class="create_food_btn" style="background: #ea4335;">
+                🌐 Open in Gmail
             </a>
             @if(!empty($message->phone))
             <a href="tel:{{ $message->phone }}" class="create_food_btn" style="background: #059669;">
@@ -31,6 +34,12 @@
     @if(session('success'))
         <div style="margin-bottom:20px; padding:12px 16px; background:#d1fae5; color:#065f46; border-radius:12px; font-weight: 500;">
             ✓ {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div style="margin-bottom:20px; padding:12px 16px; background:#fee2e2; color:#991b1b; border-radius:12px; font-weight: 500;">
+            ⚠️ {{ session('error') }}
         </div>
     @endif
 
@@ -90,8 +99,11 @@
 
     {{-- Message Body --}}
     <div class="allfood_table_box" style="margin-bottom: 30px;">
-        <div class="box_title_row">
+        <div class="box_title_row" style="display: flex; justify-content: space-between; align-items: center;">
             <h3>Message Content</h3>
+            <span style="font-size: 12px; background: #f3f4f6; padding: 4px 10px; border-radius: 20px; color: #4b5563;">
+                {{ strlen($message->message) }} characters
+            </span>
         </div>
 
         <div style="padding: 24px 0; font-size: 15px; line-height: 1.8; color: #1f2937; white-space: pre-line;">
@@ -99,8 +111,224 @@
         </div>
     </div>
 
+    {{-- Built-in Reply Email Composer (In-page) --}}
+    <div class="allfood_table_box" id="reply-section" style="margin-bottom: 30px; border: 2px solid #e0e7ff; background: #ffffff;">
+        <div class="box_title_row" style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 20px;">✉️</span>
+                <h3 style="margin: 0; color: #1e3a8a;">Send Email Reply to Customer</h3>
+            </div>
+            <span style="font-size: 12px; font-weight: 600; color: #2563eb; background: #eff6ff; padding: 4px 12px; border-radius: 20px;">
+                Direct Delivery via FoodieHub Mail
+            </span>
+        </div>
+
+        <div style="padding: 24px 0;">
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; font-size: 13px; color: #475569; display: flex; flex-direction: column; gap: 6px;">
+                <div><b>From:</b> FoodieHub Support &lt;{{ config('mail.from.address') }}&gt;</div>
+                <div><b>To:</b> {{ $message->name }} &lt;{{ $message->email }}&gt;</div>
+            </div>
+
+            {{-- Quick Templates --}}
+            <div style="margin-bottom: 18px;">
+                <span style="font-size: 12px; font-weight: 600; color: #64748b; margin-right: 8px;">Quick Reply Templates:</span>
+                <div style="display: inline-flex; gap: 8px; flex-wrap: wrap; margin-top: 6px;">
+                    <button type="button" onclick="setTemplate('thankyou')" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px 10px; font-size: 12px; cursor: pointer; color: #334155;">
+                        👋 Thank You
+                    </button>
+                    <button type="button" onclick="setTemplate('table')" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px 10px; font-size: 12px; cursor: pointer; color: #334155;">
+                        🍽️ Table / Reservation
+                    </button>
+                    <button type="button" onclick="setTemplate('moreinfo')" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px 10px; font-size: 12px; cursor: pointer; color: #334155;">
+                        ℹ️ Need More Info
+                    </button>
+                </div>
+            </div>
+
+            <form action="{{ route('admin.messages.reply', $message->id) }}" method="POST" id="replyForm" onsubmit="handleReplySubmit()">
+                @csrf
+
+                <div style="margin-bottom: 16px;">
+                    <label for="subject" style="display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px;">
+                        Email Subject
+                    </label>
+                    <input type="text" name="subject" id="subject" class="custom_select" style="width: 100%; box-sizing: border-box;" value="Re: Your Inquiry at FoodieHub" required>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label for="reply_message" style="display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px;">
+                        Your Reply Message
+                    </label>
+                    <textarea name="reply_message" id="reply_message" rows="6" style="width: 100%; box-sizing: border-box; padding: 12px 14px; border: 1px solid #d1d5db; border-radius: 10px; font-family: inherit; font-size: 14px; line-height: 1.6; resize: vertical;" placeholder="Type your response to {{ $message->name }} here..." required>Hello {{ $message->name }},
+
+Thank you for contacting FoodieHub! 
+
+</textarea>
+                </div>
+
+                <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                    <button type="submit" id="replySubmitBtn" class="create_food_btn" style="background: #2563eb; border: none; cursor: pointer; font-size: 14px; display: inline-flex; align-items: center; gap: 8px;">
+                        <span id="replyBtnText">🚀 Send Email Reply</span>
+                    </button>
+
+                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to={{ urlencode($message->email) }}&su={{ urlencode('Re: Your Inquiry at FoodieHub') }}" target="_blank" rel="noopener noreferrer" style="font-size: 13px; color: #4b5563; text-decoration: underline; margin-left: 6px;">
+                        Or open draft in Gmail Web →
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
     @include('components.usable.footer')
 
 </div>
+
+<!-- Pop-up Reply Modal -->
+<div id="replyModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(4px); z-index: 99999; align-items: center; justify-content: center; padding: 20px;" onclick="handleBackdropClick(event)">
+    <div style="background: #ffffff; border-radius: 16px; width: 100%; max-width: 620px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); overflow: hidden; animation: popIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);">
+        
+        <!-- Modal Header -->
+        <div style="background: #1e293b; color: #ffffff; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 22px;">✉️</span>
+                <div>
+                    <h3 style="margin: 0; font-size: 17px; font-weight: 700; color: #ffffff;">Reply to {{ $message->name }}</h3>
+                    <p style="margin: 2px 0 0; font-size: 12px; color: #94a3b8;">Recipient: {{ $message->email }}</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeReplyModal()" style="background: rgba(255,255,255,0.1); border: none; color: #ffffff; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center;">
+                ✕
+            </button>
+        </div>
+
+        <!-- Modal Body Form -->
+        <form action="{{ route('admin.messages.reply', $message->id) }}" method="POST" id="modalReplyForm" onsubmit="handleModalReplySubmit()" style="padding: 24px;">
+            @csrf
+
+            <!-- Quick Template Chips -->
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 6px;">Quick Templates:</label>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button type="button" onclick="setModalTemplate('thankyou')" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; padding: 5px 10px; font-size: 12px; cursor: pointer; color: #334155;">
+                        👋 Thank You
+                    </button>
+                    <button type="button" onclick="setModalTemplate('table')" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; padding: 5px 10px; font-size: 12px; cursor: pointer; color: #334155;">
+                        🍽️ Table Reservation
+                    </button>
+                    <button type="button" onclick="setModalTemplate('moreinfo')" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; padding: 5px 10px; font-size: 12px; cursor: pointer; color: #334155;">
+                        ℹ️ Need More Details
+                    </button>
+                </div>
+            </div>
+
+            <!-- Subject -->
+            <div style="margin-bottom: 14px;">
+                <label for="modal_subject" style="display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px;">
+                    Email Subject
+                </label>
+                <input type="text" name="subject" id="modal_subject" class="custom_select" style="width: 100%; box-sizing: border-box;" value="Re: Your Inquiry at FoodieHub" required>
+            </div>
+
+            <!-- Message Body -->
+            <div style="margin-bottom: 20px;">
+                <label for="modal_reply_message" style="display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px;">
+                    Your Message
+                </label>
+                <textarea name="reply_message" id="modal_reply_message" rows="6" style="width: 100%; box-sizing: border-box; padding: 12px 14px; border: 1px solid #d1d5db; border-radius: 10px; font-family: inherit; font-size: 14px; line-height: 1.6; resize: vertical;" placeholder="Type your response to {{ $message->name }}..." required>Hello {{ $message->name }},
+
+Thank you for reaching out to FoodieHub! 
+
+</textarea>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: flex; gap: 12px; align-items: center; justify-content: flex-end; flex-wrap: wrap; padding-top: 14px; border-top: 1px solid #f1f5f9;">
+                <a href="https://mail.google.com/mail/?view=cm&fs=1&to={{ urlencode($message->email) }}&su={{ urlencode('Re: Your Inquiry at FoodieHub') }}" target="_blank" rel="noopener noreferrer" style="font-size: 13px; color: #ea4335; text-decoration: underline; margin-right: auto;">
+                    🌐 Open in Gmail Web
+                </a>
+                <button type="button" onclick="closeReplyModal()" style="background: #f3f4f6; border: 1px solid #e5e7eb; color: #4b5563; padding: 10px 18px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer;">
+                    Cancel
+                </button>
+                <button type="submit" id="modalSubmitBtn" class="create_food_btn" style="background: #2563eb; border: none; cursor: pointer; font-size: 14px; margin: 0;">
+                    <span id="modalSubmitText">🚀 Send Email Now</span>
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<script>
+    function openReplyModal() {
+        const modal = document.getElementById('replyModal');
+        modal.style.display = 'flex';
+        document.getElementById('modal_reply_message').focus();
+    }
+
+    function closeReplyModal() {
+        const modal = document.getElementById('replyModal');
+        modal.style.display = 'none';
+    }
+
+    function handleBackdropClick(e) {
+        if (e.target.id === 'replyModal') {
+            closeReplyModal();
+        }
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeReplyModal();
+        }
+    });
+
+    function setModalTemplate(type) {
+        const textarea = document.getElementById('modal_reply_message');
+        const customerName = "{{ addslashes($message->name) }}";
+
+        if (type === 'thankyou') {
+            textarea.value = `Hello ${customerName},\n\nThank you for reaching out to us at FoodieHub!\n\nWe have received your message and appreciate your feedback. If you have any further questions or requests, please let us know.\n\nWarm regards,\nFoodieHub Support Team`;
+        } else if (type === 'table') {
+            textarea.value = `Hello ${customerName},\n\nThank you for contacting FoodieHub regarding table reservations.\n\nWe would be delighted to host you! Could you please confirm the preferred date, time, and number of guests so we can prepare your table?\n\nWarm regards,\nFoodieHub Reservations`;
+        } else if (type === 'moreinfo') {
+            textarea.value = `Hello ${customerName},\n\nThank you for reaching out to FoodieHub.\n\nCould you please share a few more details regarding your inquiry (such as order ID or specific menu item) so our team can assist you as quickly as possible?\n\nWarm regards,\nFoodieHub Support Team`;
+        }
+        textarea.focus();
+    }
+
+    function setTemplate(type) {
+        const textarea = document.getElementById('reply_message');
+        const customerName = "{{ addslashes($message->name) }}";
+
+        if (type === 'thankyou') {
+            textarea.value = `Hello ${customerName},\n\nThank you for reaching out to us at FoodieHub!\n\nWe have received your message and appreciate your feedback. If you have any further questions or requests, please let us know.\n\nWarm regards,\nFoodieHub Support Team`;
+        } else if (type === 'table') {
+            textarea.value = `Hello ${customerName},\n\nThank you for contacting FoodieHub regarding table reservations.\n\nWe would be delighted to host you! Could you please confirm the preferred date, time, and number of guests so we can prepare your table?\n\nWarm regards,\nFoodieHub Reservations`;
+        } else if (type === 'moreinfo') {
+            textarea.value = `Hello ${customerName},\n\nThank you for reaching out to FoodieHub.\n\nCould you please share a few more details regarding your inquiry (such as order ID or specific menu item) so our team can assist you as quickly as possible?\n\nWarm regards,\nFoodieHub Support Team`;
+        }
+        textarea.focus();
+    }
+
+    function handleModalReplySubmit() {
+        const btn = document.getElementById('modalSubmitBtn');
+        const text = document.getElementById('modalSubmitText');
+        btn.disabled = true;
+        btn.style.opacity = '0.7';
+        btn.style.cursor = 'not-allowed';
+        text.innerText = '⏳ Sending Email...';
+        return true;
+    }
+
+    function handleReplySubmit() {
+        const btn = document.getElementById('replySubmitBtn');
+        const text = document.getElementById('replyBtnText');
+        btn.disabled = true;
+        btn.style.opacity = '0.7';
+        btn.style.cursor = 'not-allowed';
+        text.innerText = '⏳ Sending Email...';
+        return true;
+    }
+</script>
 
 @endsection
