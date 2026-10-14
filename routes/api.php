@@ -14,6 +14,7 @@ Route::get('/home-data/{page}' , [HomeApiController::class , 'homeApi']);
 Route::get('/food-data' , [FoodItemsApiController::class , 'foodApi']);
 
 Route::post('/contact', [ContactMessageController::class, 'store']);
+Route::get('/orders/{id}/tracking', [OrderController::class, 'getTrackingDetails']);
 
 // Admin Login Credentials Route
 

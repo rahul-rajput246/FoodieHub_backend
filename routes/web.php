@@ -133,6 +133,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/orders/store', [OrderController::class, 'store'])->name('orders.store');
 });
 
+// Public Live Order Tracking Route
+Route::get('/orders/{id}/tracking', [OrderController::class, 'getTrackingDetails'])->name('orders.tracking');
+
 // Admin Order Routes
 
 Route::middleware(['auth', 'role:admin'])->group(function () {

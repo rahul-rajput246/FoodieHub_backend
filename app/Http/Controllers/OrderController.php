@@ -565,4 +565,176 @@ public function verifyRazorpayPayment(Request $request)
             return back()->with('error', 'Failed to send email: ' . $e->getMessage());
         }
     }
+
+    /**
+     * API: Live order tracking data for customers
+     */
+    public function getTrackingDetails($id)
+    {
+        $order = Order::with('items.food', 'address', 'user')
+            ->where(function ($query) use ($id) {
+                if (is_numeric($id)) {
+                    $query->where('id', $id)->orWhere('order_number', $id);
+                } else {
+                    $query->where('order_number', $id);
+                }
+            })
+            ->first();
+
+        if (!$order) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Order not found with provided ID or Order Number.',
+            ], 404);
+        }
+
+        $statusMap = [
+            'pending' => 1,
+            'confirmed' => 2,
+            'preparing' => 3,
+            'out_for_delivery' => 4,
+            'delivered' => 5,
+            'cancelled' => 0,
+        ];
+
+        $currentStep = $statusMap[$order->status] ?? 1;
+
+        $placedTime = $order->created_at->format('h:i A');
+        $confirmedTime = $order->created_at->addMinutes(2)->format('h:i A');
+        $preparingTime = $order->created_at->addMinutes(8)->format('h:i A');
+        $outForDeliveryTime = $order->created_at->addMinutes(20)->format('h:i A');
+        $deliveredTime = $order->created_at->addMinutes(35)->format('h:i A');
+
+        $steps = [
+            [
+                'step' => 1,
+                'key' => 'pending',
+                'title' => 'Order Placed',
+                'description' => 'We received your order and sent it to our kitchen.',
+                'icon' => '📝',
+                'completed' => $currentStep >= 1 && $order->status !== 'cancelled',
+                'current' => $currentStep === 1,
+                'time' => $placedTime,
+            ],
+            [
+                'step' => 2,
+                'key' => 'confirmed',
+                'title' => 'Order Confirmed',
+                'description' => 'Kitchen has accepted and queued your order.',
+                'icon' => '✅',
+                'completed' => $currentStep >= 2 && $order->status !== 'cancelled',
+                'current' => $currentStep === 2,
+                'time' => $currentStep >= 2 ? $confirmedTime : 'Est ' . $confirmedTime,
+            ],
+            [
+                'step' => 3,
+                'key' => 'preparing',
+                'title' => 'Preparing Food',
+                'description' => 'Our master chef is cooking your meal fresh.',
+                'icon' => '🍳',
+                'completed' => $currentStep >= 3 && $order->status !== 'cancelled',
+                'current' => $currentStep === 3,
+                'time' => $currentStep >= 3 ? $preparingTime : 'Est ' . $preparingTime,
+            ],
+            [
+                'step' => 4,
+                'key' => 'out_for_delivery',
+                'title' => 'Out for Delivery',
+                'description' => 'Delivery rider is on the way with your hot meal.',
+                'icon' => '🛵',
+                'completed' => $currentStep >= 4 && $order->status !== 'cancelled',
+                'current' => $currentStep === 4,
+                'time' => $currentStep >= 4 ? $outForDeliveryTime : 'Est ' . $outForDeliveryTime,
+            ],
+            [
+                'step' => 5,
+                'key' => 'delivered',
+                'title' => 'Delivered',
+                'description' => 'Order delivered at your doorstep. Enjoy your meal!',
+                'icon' => '🎉',
+                'completed' => $currentStep >= 5 && $order->status !== 'cancelled',
+                'current' => $currentStep === 5,
+                'time' => $currentStep >= 5 ? $deliveredTime : 'Est ' . $deliveredTime,
+            ],
+        ];
+
+        $statusMessages = [
+            'pending' => 'Waiting for kitchen confirmation...',
+            'confirmed' => 'Kitchen accepted your order! Preparation starting shortly.',
+            'preparing' => 'Chef is preparing your fresh meal right now!',
+            'out_for_delivery' => 'Your rider is on the road heading to your address.',
+            'delivered' => 'Your order has been delivered! Bon appétit!',
+            'cancelled' => 'This order was cancelled.',
+        ];
+
+        $etaMap = [
+            'pending' => '30–35 Mins',
+            'confirmed' => '25–30 Mins',
+            'preparing' => '15–20 Mins',
+            'out_for_delivery' => '5–10 Mins',
+            'delivered' => 'Delivered',
+            'cancelled' => 'Cancelled',
+        ];
+
+        $progressPercentages = [
+            'pending' => 10,
+            'confirmed' => 25,
+            'preparing' => 55,
+            'out_for_delivery' => 85,
+            'delivered' => 100,
+            'cancelled' => 0,
+        ];
+
+        $deliveryPartner = null;
+        if (in_array($order->status, ['preparing', 'out_for_delivery', 'delivered'])) {
+            $deliveryPartner = [
+                'name' => 'Amit Sharma',
+                'phone' => '+91 98765 43210',
+                'rating' => '4.9 ★',
+                'vehicle' => 'Electric Scooter (MH-02-EE-1234)',
+                'deliveries' => '1,420+ delivered',
+            ];
+        }
+
+        return response()->json([
+            'success' => true,
+            'order' => [
+                'id' => $order->id,
+                'order_number' => $order->order_number,
+                'status' => $order->status,
+                'status_label' => ucfirst(str_replace('_', ' ', $order->status)),
+                'status_message' => $statusMessages[$order->status] ?? 'Processing order...',
+                'current_step' => $currentStep,
+                'total_steps' => 5,
+                'progress_percentage' => $progressPercentages[$order->status] ?? 20,
+                'is_cancelled' => $order->status === 'cancelled',
+                'estimated_delivery' => $etaMap[$order->status] ?? '25–30 Mins',
+                'payment_method' => strtoupper($order->payment_method ?? 'COD'),
+                'payment_status' => ucfirst($order->payment_status ?? 'pending'),
+                'total_amount' => (float) $order->total_amount,
+                'created_at' => $order->created_at->format('d M Y, h:i A'),
+                'updated_at' => $order->updated_at->format('d M Y, h:i A'),
+                'delivery_partner' => $deliveryPartner,
+                'address' => $order->address ? [
+                    'full_name' => $order->address->full_name,
+                    'mobile' => $order->address->mobile,
+                    'address_line' => $order->address->address_line,
+                    'city' => $order->address->city,
+                    'state' => $order->address->state,
+                    'pincode' => $order->address->pincode,
+                    'landmark' => $order->address->landmark,
+                ] : null,
+                'items' => $order->items->map(function ($item) {
+                    return [
+                        'id' => $item->id,
+                        'food_name' => $item->food_name,
+                        'quantity' => $item->quantity,
+                        'price' => (float) $item->price,
+                        'subtotal' => (float) $item->subtotal,
+                    ];
+                }),
+                'steps' => $steps,
+            ],
+        ]);
+    }
 }
