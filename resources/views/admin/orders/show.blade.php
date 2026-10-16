@@ -72,6 +72,9 @@
                 <p><b>Email:</b> {{ $order->user->email ?? 'N/A' }}</p>
                 <p><b>Payment Method:</b> {{ strtoupper($order->payment_method ?? 'N/A') }}</p>
                 <p><b>Payment Status:</b> {{ ucfirst($order->payment_status) }}</p>
+                @if($order->coupon_code)
+                    <p><b>Coupon Applied:</b> <span style="background:#fef3c7; color:#b45309; padding:2px 8px; border-radius:4px; font-weight:bold; letter-spacing:0.5px;">{{ $order->coupon_code }}</span> (Saved ₹{{ number_format($order->discount_amount, 2) }})</p>
+                @endif
                 <p><b>Notes:</b> {{ $order->notes ?? 'No notes added' }}</p>
                 <p><b>Placed On:</b> {{ $order->created_at->format('d M Y, h:i A') }}</p>
             </div>

@@ -314,7 +314,7 @@
 
         @if($calculatedDiscount > 0)
         <div class="total-row">
-            <span>Discount Applied:</span>
+            <span>{{ !empty($order->coupon_code) ? 'Coupon (' . $order->coupon_code . '):' : 'Discount Applied:' }}</span>
             <span>-₹{{ number_format($calculatedDiscount, 2) }}</span>
         </div>
         @endif

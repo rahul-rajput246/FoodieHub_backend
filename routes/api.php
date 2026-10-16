@@ -8,6 +8,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\ContactMessageController;
+use App\Http\Controllers\Api\CouponApiController;
 
 Route::get('/home-data/{page}' , [HomeApiController::class , 'homeApi']);
 
@@ -15,6 +16,10 @@ Route::get('/food-data' , [FoodItemsApiController::class , 'foodApi']);
 
 Route::post('/contact', [ContactMessageController::class, 'store']);
 Route::get('/orders/{id}/tracking', [OrderController::class, 'getTrackingDetails']);
+
+// Coupons & Promo Codes
+Route::get('/coupons/available', [CouponApiController::class, 'getAvailableCoupons']);
+Route::post('/coupons/apply', [CouponApiController::class, 'applyCoupon']);
 
 // Admin Login Credentials Route
 

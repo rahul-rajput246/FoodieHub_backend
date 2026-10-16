@@ -111,6 +111,17 @@
                 @endif
             </a>
         </li>
+
+        <li>
+            <a href="/admin/coupons" class="toggle_class {{ request()->is('admin/coupons*') ? 'active' : '' }}">
+                <span class="menu_icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="22px" viewBox="0 -960 960 960" width="22px" fill="#ffffff">
+                        <path d="m576-80-56-56 104-104-104-104 56-56 160 160L576-80ZM120-320v-80h80v-80H120v-80h80v-80H120v-80h280v400H120Zm360 0v-160h160v160H480Zm0-240v-160h160v160H480ZM280-400h40v-80h-40v80Zm0-160h40v-80h-40v80Zm0-160h40v-80h-40v80Z"/>
+                    </svg>
+                </span>
+                <span class="menu_text">Coupons & Offers</span>
+            </a>
+        </li>
         @endif
 
         {{-- USER ITEMS (Accessible by users, admin gets all details) --}}

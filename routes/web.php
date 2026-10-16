@@ -14,6 +14,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ContactMessageController;
+use App\Http\Controllers\AdminCouponController;
 
 Route::get('/', function () {
     return redirect('http://localhost:5173'); 
@@ -152,6 +153,15 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('/admin/messages/{id}/status', [ContactMessageController::class, 'updateStatus'])->name('admin.messages.status');
     Route::post('/admin/messages/{id}/reply', [ContactMessageController::class, 'sendReply'])->name('admin.messages.reply');
     Route::delete('/admin/messages/{id}', [ContactMessageController::class, 'destroy'])->name('admin.messages.destroy');
+
+    // Coupon & Promo Code Management
+    Route::get('/admin/coupons', [AdminCouponController::class, 'index'])->name('admin.coupons.index');
+    Route::get('/admin/coupons/create', [AdminCouponController::class, 'create'])->name('admin.coupons.create');
+    Route::post('/admin/coupons/store', [AdminCouponController::class, 'store'])->name('admin.coupons.store');
+    Route::get('/admin/coupons/{id}/edit', [AdminCouponController::class, 'edit'])->name('admin.coupons.edit');
+    Route::post('/admin/coupons/{id}/update', [AdminCouponController::class, 'update'])->name('admin.coupons.update');
+    Route::post('/admin/coupons/{id}/toggle', [AdminCouponController::class, 'toggleStatus'])->name('admin.coupons.toggle');
+    Route::delete('/admin/coupons/{id}', [AdminCouponController::class, 'destroy'])->name('admin.coupons.destroy');
 });
 
 // Cart Route

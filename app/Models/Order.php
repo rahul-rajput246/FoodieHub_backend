@@ -22,6 +22,9 @@ class Order extends Model
         'driver_name',
         'driver_phone',
         'driver_vehicle',
+        'coupon_id',
+        'coupon_code',
+        'discount_amount',
     ];
 
     // Relationship: Order belongs to User
@@ -40,5 +43,11 @@ class Order extends Model
     public function items()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    // Relationship: Order may have a Coupon
+    public function coupon()
+    {
+        return $this->belongsTo(Coupon::class);
     }
 }

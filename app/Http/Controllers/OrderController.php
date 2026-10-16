@@ -15,6 +15,8 @@ use App\Models\CartItem;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderSuccessMail;
+use App\Models\Coupon;
+use App\Models\CouponUsage;
 
 class OrderController extends Controller
 {
@@ -111,6 +113,7 @@ class OrderController extends Controller
             'cart.*.id' => 'required|exists:foodItems,id',
             'cart.*.qty' => 'required|integer|min:1',
             'notes' => 'nullable|string',
+            'coupon_code' => 'nullable|string',
         ]);
 
         $address = UserAddress::where('id', $request->address_id)
@@ -144,7 +147,31 @@ class OrderController extends Controller
         }
 
         $deliveryFee = $subtotal > 499 ? 0 : 40;
-        $discount = $subtotal > 999 ? 100 : 0;
+        $discount = 0;
+        $coupon = null;
+
+        if ($request->filled('coupon_code')) {
+            $couponCode = strtoupper(trim($request->coupon_code));
+            $coupon = Coupon::where('code', $couponCode)->first();
+
+            if (!$coupon) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Coupon code '{$couponCode}' is invalid or expired."
+                ], 422);
+            }
+
+            $validation = $coupon->validateFor($subtotal, Auth::id());
+            if (!$validation['valid']) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validation['message']
+                ], 422);
+            }
+
+            $discount = $validation['discount'];
+        }
+
         $total = max(0, $subtotal + $deliveryFee - $discount);
 
         $order = Order::create([
@@ -152,6 +179,9 @@ class OrderController extends Controller
             'address_id' => $address->id,
             'order_number' => 'ORD-' . date('Y') . '-' . strtoupper(uniqid()),
             'total_amount' => $total,
+            'coupon_id' => $coupon ? $coupon->id : null,
+            'coupon_code' => $coupon ? $coupon->code : null,
+            'discount_amount' => $discount,
             'status' => 'confirmed',
             'payment_method' => $request->payment_method,
             'payment_status' => 'pending',
@@ -173,6 +203,17 @@ class OrderController extends Controller
                 'quantity' => $item['qty'],
                 'subtotal' => $food->food_price * $item['qty'],
             ]);
+        }
+
+        // Record coupon usage if coupon discount was applied
+        if ($coupon && $discount > 0) {
+            CouponUsage::create([
+                'coupon_id' => $coupon->id,
+                'user_id' => Auth::id(),
+                'order_id' => $order->id,
+                'discount_applied' => $discount,
+            ]);
+            $coupon->increment('used_count');
         }
 
         CartItem::where('user_id', Auth::id())->delete();
@@ -277,6 +318,7 @@ class OrderController extends Controller
         'cart.*.id' => 'required|exists:foodItems,id',
         'cart.*.qty' => 'required|integer|min:1',
         'notes' => 'nullable|string',
+        'coupon_code' => 'nullable|string',
     ]);
 
     $address = UserAddress::where('id', $request->address_id)
@@ -302,7 +344,31 @@ class OrderController extends Controller
     }
 
     $deliveryFee = $subtotal > 499 ? 0 : 40;
-    $discount = $subtotal > 999 ? 100 : 0;
+    $discount = 0;
+    $coupon = null;
+
+    if ($request->filled('coupon_code')) {
+        $couponCode = strtoupper(trim($request->coupon_code));
+        $coupon = Coupon::where('code', $couponCode)->first();
+
+        if (!$coupon) {
+            return response()->json([
+                'success' => false,
+                'message' => "Coupon code '{$couponCode}' is invalid or expired."
+            ], 422);
+        }
+
+        $validation = $coupon->validateFor($subtotal, Auth::id());
+        if (!$validation['valid']) {
+            return response()->json([
+                'success' => false,
+                'message' => $validation['message']
+            ], 422);
+        }
+
+        $discount = $validation['discount'];
+    }
+
     $total = max(0, $subtotal + $deliveryFee - $discount);
 
     DB::beginTransaction();
@@ -313,6 +379,9 @@ class OrderController extends Controller
             'address_id' => $address->id,
             'order_number' => 'ORD-' . date('Y') . '-' . strtoupper(uniqid()),
             'total_amount' => $total,
+            'coupon_id' => $coupon ? $coupon->id : null,
+            'coupon_code' => $coupon ? $coupon->code : null,
+            'discount_amount' => $discount,
             'status' => 'confirmed',
             'payment_method' => 'razorpay',
             'payment_status' => 'pending',
@@ -415,6 +484,23 @@ public function verifyRazorpayPayment(Request $request)
         'status' => 'confirmed',
     ]);
 
+    // Record coupon usage if coupon discount was applied and not already recorded
+    if ($order->coupon_id && $order->discount_amount > 0) {
+        $usageExists = CouponUsage::where('order_id', $order->id)->exists();
+        if (!$usageExists) {
+            CouponUsage::create([
+                'coupon_id' => $order->coupon_id,
+                'user_id' => $order->user_id,
+                'order_id' => $order->id,
+                'discount_applied' => $order->discount_amount,
+            ]);
+            $coupon = Coupon::find($order->coupon_id);
+            if ($coupon) {
+                $coupon->increment('used_count');
+            }
+        }
+    }
+
     CartItem::where('user_id', Auth::id())->delete();
 
     // Send order confirmation & invoice email
@@ -439,7 +525,7 @@ public function verifyRazorpayPayment(Request $request)
         }
 
         $calculatedDeliveryFee = $calculatedSubtotal > 499 ? 0 : 40;
-        $calculatedDiscount = $calculatedSubtotal > 999 ? 100 : 0;
+        $calculatedDiscount = $order->discount_amount !== null ? (float) $order->discount_amount : ($calculatedSubtotal > 999 ? 100 : 0);
 
         return [
             'calculatedSubtotal' => $calculatedSubtotal,

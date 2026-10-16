@@ -398,7 +398,13 @@
                     </tr>
                     @if($calculatedDiscount > 0)
                     <tr>
-                        <td class="label" style="color: #059669;">Special Discount:</td>
+                        <td class="label" style="color: #059669;">
+                            @if(!empty($order->coupon_code))
+                                Coupon Discount ({{ $order->coupon_code }}):
+                            @else
+                                Special Discount:
+                            @endif
+                        </td>
                         <td class="value" style="color: #059669;">-Rs. {{ number_format($calculatedDiscount, 2) }}</td>
                     </tr>
                     @endif
