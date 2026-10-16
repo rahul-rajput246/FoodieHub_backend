@@ -14,15 +14,27 @@
         </div>
 
         <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-            <button type="button" class="create_food_btn" style="background: #2563eb; border: none; cursor: pointer;" onclick="openReplyModal()">
-                ✉️ Reply via Email
+            <button type="button" class="create_food_btn" style="background: #2563eb; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;" onclick="openReplyModal()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+                Reply via Email
             </button>
-            <a href="https://mail.google.com/mail/?view=cm&fs=1&to={{ urlencode($message->email) }}&su={{ urlencode('Re: Your Inquiry at FoodieHub') }}&body={{ urlencode("Hello " . $message->name . ",\n\nThank you for reaching out to FoodieHub!\n\nRegarding your message:\n\"" . \Illuminate\Support\Str::limit($message->message, 120) . "\"\n\n") }}" target="_blank" rel="noopener noreferrer" class="create_food_btn" style="background: #ea4335;">
-                🌐 Open in Gmail
+            <a href="https://mail.google.com/mail/?view=cm&fs=1&to={{ urlencode($message->email) }}&su={{ urlencode('Re: Your Inquiry at FoodieHub') }}&body={{ urlencode("Hello " . $message->name . ",\n\nThank you for reaching out to FoodieHub!\n\nRegarding your message:\n\"" . \Illuminate\Support\Str::limit($message->message, 120) . "\"\n\n") }}" target="_blank" rel="noopener noreferrer" class="create_food_btn" style="background: #ea4335; display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                </svg>
+                Open in Gmail
             </a>
             @if(!empty($message->phone))
-            <a href="tel:{{ $message->phone }}" class="create_food_btn" style="background: #059669;">
-                📞 Call Customer
+            <a href="tel:{{ $message->phone }}" class="create_food_btn" style="background: #059669; display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                </svg>
+                Call Customer
             </a>
             @endif
             <a href="{{ route('admin.messages.index') }}" class="create_food_btn" style="background: #374151;">
@@ -32,14 +44,22 @@
     </div>
 
     @if(session('success'))
-        <div style="margin-bottom:20px; padding:12px 16px; background:#d1fae5; color:#065f46; border-radius:12px; font-weight: 500;">
-            ✓ {{ session('success') }}
+        <div style="margin-bottom:20px; padding:12px 16px; background:#d1fae5; color:#065f46; border-radius:12px; font-weight: 500; display: flex; align-items: center; gap: 8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span>{{ session('success') }}</span>
         </div>
     @endif
 
     @if(session('error'))
-        <div style="margin-bottom:20px; padding:12px 16px; background:#fee2e2; color:#991b1b; border-radius:12px; font-weight: 500;">
-            ⚠️ {{ session('error') }}
+        <div style="margin-bottom:20px; padding:12px 16px; background:#fee2e2; color:#991b1b; border-radius:12px; font-weight: 500; display: flex; align-items: center; gap: 8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span>{{ session('error') }}</span>
         </div>
     @endif
 
@@ -87,8 +107,12 @@
                     <form action="{{ route('admin.messages.destroy', $message->id) }}" method="POST" onsubmit="return confirm('Permanently delete this inquiry?');">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" style="background: none; border: none; color: #dc2626; font-size: 13px; font-weight: 600; cursor: pointer; padding: 0;">
-                            🗑️ Delete This Inquiry
+                        <button type="submit" style="background: none; border: none; color: #dc2626; font-size: 13px; font-weight: 600; cursor: pointer; padding: 0; display: inline-flex; align-items: center; gap: 5px;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                            Delete This Inquiry
                         </button>
                     </form>
                 </div>
@@ -115,7 +139,10 @@
     <div class="allfood_table_box" id="reply-section" style="margin-bottom: 30px; border: 2px solid #e0e7ff; background: #ffffff;">
         <div class="box_title_row" style="display: flex; justify-content: space-between; align-items: center;">
             <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 20px;">✉️</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
                 <h3 style="margin: 0; color: #1e3a8a;">Send Email Reply to Customer</h3>
             </div>
             <span style="font-size: 12px; font-weight: 600; color: #2563eb; background: #eff6ff; padding: 4px 12px; border-radius: 20px;">
@@ -133,14 +160,17 @@
             <div style="margin-bottom: 18px;">
                 <span style="font-size: 12px; font-weight: 600; color: #64748b; margin-right: 8px;">Quick Reply Templates:</span>
                 <div style="display: inline-flex; gap: 8px; flex-wrap: wrap; margin-top: 6px;">
-                    <button type="button" onclick="setTemplate('thankyou')" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px 10px; font-size: 12px; cursor: pointer; color: #334155;">
-                        👋 Thank You
+                    <button type="button" onclick="setTemplate('thankyou')" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; padding: 5px 10px; font-size: 12px; cursor: pointer; color: #334155; display: inline-flex; align-items: center; gap: 4px;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
+                        Thank You
                     </button>
-                    <button type="button" onclick="setTemplate('table')" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px 10px; font-size: 12px; cursor: pointer; color: #334155;">
-                        🍽️ Table / Reservation
+                    <button type="button" onclick="setTemplate('table')" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; padding: 5px 10px; font-size: 12px; cursor: pointer; color: #334155; display: inline-flex; align-items: center; gap: 4px;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2v20"></path><path d="M22 2v6a4 4 0 0 1-4 4v10"></path><path d="M6 2v7a3 3 0 0 1-3 3v8h6v-8a3 3 0 0 1-3-3V2"></path></svg>
+                        Table / Reservation
                     </button>
-                    <button type="button" onclick="setTemplate('moreinfo')" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px 10px; font-size: 12px; cursor: pointer; color: #334155;">
-                        ℹ️ Need More Info
+                    <button type="button" onclick="setTemplate('moreinfo')" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; padding: 5px 10px; font-size: 12px; cursor: pointer; color: #334155; display: inline-flex; align-items: center; gap: 4px;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        Need More Info
                     </button>
                 </div>
             </div>
@@ -190,7 +220,10 @@ Thank you for contacting FoodieHub!
         <!-- Modal Header -->
         <div style="background: #1e293b; color: #ffffff; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between;">
             <div style="display: flex; align-items: center; gap: 10px;">
-                <span style="font-size: 22px;">✉️</span>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
                 <div>
                     <h3 style="margin: 0; font-size: 17px; font-weight: 700; color: #ffffff;">Reply to {{ $message->name }}</h3>
                     <p style="margin: 2px 0 0; font-size: 12px; color: #94a3b8;">Recipient: {{ $message->email }}</p>
@@ -209,14 +242,17 @@ Thank you for contacting FoodieHub!
             <div style="margin-bottom: 16px;">
                 <label style="display: block; font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 6px;">Quick Templates:</label>
                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <button type="button" onclick="setModalTemplate('thankyou')" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; padding: 5px 10px; font-size: 12px; cursor: pointer; color: #334155;">
-                        👋 Thank You
+                    <button type="button" onclick="setModalTemplate('thankyou')" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; padding: 5px 10px; font-size: 12px; cursor: pointer; color: #334155; display: inline-flex; align-items: center; gap: 4px;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
+                        Thank You
                     </button>
-                    <button type="button" onclick="setModalTemplate('table')" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; padding: 5px 10px; font-size: 12px; cursor: pointer; color: #334155;">
-                        🍽️ Table Reservation
+                    <button type="button" onclick="setModalTemplate('table')" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; padding: 5px 10px; font-size: 12px; cursor: pointer; color: #334155; display: inline-flex; align-items: center; gap: 4px;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2v20"></path><path d="M22 2v6a4 4 0 0 1-4 4v10"></path><path d="M6 2v7a3 3 0 0 1-3 3v8h6v-8a3 3 0 0 1-3-3V2"></path></svg>
+                        Table Reservation
                     </button>
-                    <button type="button" onclick="setModalTemplate('moreinfo')" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; padding: 5px 10px; font-size: 12px; cursor: pointer; color: #334155;">
-                        ℹ️ Need More Details
+                    <button type="button" onclick="setModalTemplate('moreinfo')" style="background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px; padding: 5px 10px; font-size: 12px; cursor: pointer; color: #334155; display: inline-flex; align-items: center; gap: 4px;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        Need More Details
                     </button>
                 </div>
             </div>

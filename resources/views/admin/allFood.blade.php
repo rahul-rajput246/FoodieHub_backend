@@ -77,8 +77,22 @@
                                     @endif
                                 </div>
                                 <div class="food_list_text">
-                                    <h4>{{ $food->food_name }}</h4>
-                                    <p>Crispy & spicy burger</p>
+                                    <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                                        @if($food->is_veg)
+                                            <span style="display:inline-flex; align-items:center; justify-content:center; width:14px; height:14px; border:1.5px solid #16a34a; border-radius:3px; background:#fff; flex-shrink:0;" title="Pure Veg">
+                                                <span style="display:block; width:6px; height:6px; background:#16a34a; border-radius:50%;"></span>
+                                            </span>
+                                        @else
+                                            <span style="display:inline-flex; align-items:center; justify-content:center; width:14px; height:14px; border:1.5px solid #b91c1c; border-radius:3px; background:#fff; flex-shrink:0;" title="Non-Veg">
+                                                <span style="display:block; width:0; height:0; border-left:3.5px solid transparent; border-right:3.5px solid transparent; border-bottom:6px solid #b91c1c;"></span>
+                                            </span>
+                                        @endif
+                                        <h4 style="margin:0;">{{ $food->food_name }}</h4>
+                                        @if($food->has_customizations)
+                                            <span style="font-size:10px; font-weight:700; color:#e23744; background:#fff1f2; border:1px solid #ffe4e6; padding:1px 5px; border-radius:4px; text-transform:uppercase;">Customisable</span>
+                                        @endif
+                                    </div>
+                                    <p>{{ $food->food_subtitle ?? 'Delicious dish' }}</p>
                                 </div>
                             </div>
                         </td>

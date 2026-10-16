@@ -14,14 +14,33 @@
         </div>
 
         <div class="dashboard_header_right" style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <a href="http://localhost:5173/track-order/{{ $order->order_number }}" target="_blank" class="dashboard_top_btn" style="background: linear-gradient(135deg, #ff7e00 0%, #ea580c 100%);">
-                🛵 Track Live on Map
+            <a href="http://localhost:5173/track-order/{{ $order->order_number }}" target="_blank" class="dashboard_top_btn" style="background: linear-gradient(135deg, #ff7e00 0%, #ea580c 100%); display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="5.5" cy="17.5" r="3.5"></circle>
+                    <circle cx="18.5" cy="17.5" r="3.5"></circle>
+                    <path d="M15 6h4l2 5.5-2.5 1"></path>
+                    <path d="M9 17.5h6"></path>
+                    <path d="M12 9l-3 8.5"></path>
+                    <path d="M7 6h5"></path>
+                </svg>
+                Track Live on Map
             </a>
-            <a href="{{ route('orders.invoice', $order->id) }}" class="dashboard_top_btn" style="background: #2563eb;">
-                📄 Download Invoice
+            <a href="{{ route('orders.invoice', $order->id) }}" class="dashboard_top_btn" style="background: #2563eb; display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                </svg>
+                Download Invoice
             </a>
-            <a href="{{ route('orders.receipt', $order->id) }}" target="_blank" class="dashboard_top_btn" style="background: #059669;">
-                🖨️ Print Receipt
+            <a href="{{ route('orders.receipt', $order->id) }}" target="_blank" class="dashboard_top_btn" style="background: #059669; display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                    <rect x="6" y="14" width="12" height="8"></rect>
+                </svg>
+                Print Receipt
             </a>
             <a href="{{ route('orders.index') }}" class="dashboard_top_btn" style="background: #374151;">← Back to Orders</a>
             <a href="http://localhost:5173/Menu" class="dashboard_top_btn">+ Order Again</a>
@@ -53,12 +72,23 @@
     <div class="allfood_table_box" style="margin-bottom: 24px; border: 1px solid #fed7aa; background: #ffffff;">
         <div class="box_title_row" style="display: flex; justify-content: space-between; align-items: center;">
             <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 20px;">🛵</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="5.5" cy="17.5" r="3.5"></circle>
+                    <circle cx="18.5" cy="17.5" r="3.5"></circle>
+                    <path d="M15 6h4l2 5.5-2.5 1"></path>
+                    <path d="M9 17.5h6"></path>
+                    <path d="M12 9l-3 8.5"></path>
+                    <path d="M7 6h5"></path>
+                </svg>
                 <h3 style="margin: 0; color: #111827;">Live Delivery Journey</h3>
             </div>
             <div style="display: flex; align-items: center; gap: 10px;">
-                <span style="font-size: 13px; font-weight: 600; color: #ea580c; background: #fff4ea; padding: 4px 12px; border-radius: 20px;">
-                    ⏱️ ETA: {{ $etaMap[$order->status] ?? '25–30 Mins' }}
+                <span style="font-size: 13px; font-weight: 600; color: #ea580c; background: #fff4ea; padding: 4px 12px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 14 14"></polyline>
+                    </svg>
+                    ETA: {{ $etaMap[$order->status] ?? '25–30 Mins' }}
                 </span>
                 <a href="http://localhost:5173/track-order/{{ $order->order_number }}" target="_blank" style="font-size: 12px; color: #2563eb; text-decoration: underline; font-weight: 600;">
                     Open Full Map View →
@@ -209,8 +239,19 @@
                 @if($order->address)
                     <div style="font-size: 14px; line-height: 1.6; color: #374151;">
                         <strong style="color: #111827; font-size: 15px;">{{ $order->address->full_name }}</strong>
-                        <p style="margin: 4px 0;">📞 {{ $order->address->mobile }}</p>
-                        <p style="margin: 4px 0;">📍 {{ $order->address->address_line }}</p>
+                        <p style="margin: 4px 0; display: flex; align-items: center; gap: 5px;">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                            </svg>
+                            {{ $order->address->mobile }}
+                        </p>
+                        <p style="margin: 4px 0; display: flex; align-items: center; gap: 5px;">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            {{ $order->address->address_line }}
+                        </p>
                         <p style="margin: 4px 0;">{{ $order->address->city }}, {{ $order->address->state }} - {{ $order->address->pincode }}</p>
                         @if(!empty($order->address->landmark))
                             <p style="margin: 4px 0;"><small>Landmark: {{ $order->address->landmark }}</small></p>

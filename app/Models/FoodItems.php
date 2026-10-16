@@ -17,9 +17,12 @@ class FoodItems extends Model
         'food_image',
         'food_category',
         'food_type',
+        'is_veg',
         'food_stock',
         'food_price',
         'food_old_price',
+        'variations',
+        'addons',
         'food_rating',
         'food_preparation_time',
         'food_is_popular',
@@ -28,7 +31,41 @@ class FoodItems extends Model
         'category_id',
     ];
 
-        public function getCategoryNameAttribute()
+    protected $casts = [
+        'is_veg' => 'boolean',
+        'variations' => 'array',
+        'addons' => 'array',
+        'food_price' => 'float',
+        'food_old_price' => 'float',
+        'food_rating' => 'float',
+        'food_is_popular' => 'boolean',
+        'food_is_featured' => 'boolean',
+        'food_status' => 'boolean',
+    ];
+
+    protected $appends = ['category_name', 'image_url', 'dietary_type', 'has_customizations'];
+
+    public function getDietaryTypeAttribute()
+    {
+        // 1 or 'non_veg' or is_veg === false indicates Non-Veg
+        if ($this->is_veg === false) {
+            return 'non_veg';
+        }
+        $rawType = (string) $this->food_type;
+        if ($rawType === '1' || strtolower($rawType) === 'non_veg') {
+            return 'non_veg';
+        }
+        return 'veg';
+    }
+
+    public function getHasCustomizationsAttribute()
+    {
+        $hasVars = !empty($this->variations) && is_array($this->variations) && count($this->variations) > 0;
+        $hasAdds = !empty($this->addons) && is_array($this->addons) && count($this->addons) > 0;
+        return $hasVars || $hasAdds;
+    }
+
+    public function getCategoryNameAttribute()
     {
         $categories = [
             0 => 'Fast Food',
@@ -39,8 +76,6 @@ class FoodItems extends Model
 
         return $categories[$this->food_category] ?? 'Unknown';
     }
-
-    protected $appends = ['category_name', 'image_url'];
 
     public function getImageUrlAttribute()
     {

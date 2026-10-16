@@ -14,14 +14,30 @@
         </div>
 
         <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-            <a href="{{ route('admin.orders.sendEmail', $order->id) }}" class="create_food_btn" style="background: #8b5cf6;" onclick="return confirm('Send confirmation & invoice email to customer?')">
-                📧 Send Invoice Mail
+            <a href="{{ route('admin.orders.sendEmail', $order->id) }}" class="create_food_btn" style="background: #8b5cf6; display: inline-flex; align-items: center; gap: 6px;" onclick="return confirm('Send confirmation & invoice email to customer?')">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+                Send Invoice Mail
             </a>
-            <a href="{{ route('admin.orders.invoice', $order->id) }}" class="create_food_btn" style="background: #2563eb;">
-                📄 Download Invoice
+            <a href="{{ route('admin.orders.invoice', $order->id) }}" class="create_food_btn" style="background: #2563eb; display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                Download Invoice
             </a>
-            <a href="{{ route('admin.orders.receipt', $order->id) }}" target="_blank" class="create_food_btn" style="background: #059669;">
-                🖨️ Print Receipt
+            <a href="{{ route('admin.orders.receipt', $order->id) }}" target="_blank" class="create_food_btn" style="background: #059669; display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                    <rect x="6" y="14" width="12" height="8"></rect>
+                </svg>
+                Print Receipt
             </a>
             <a href="{{ route('admin.orders') }}" class="create_food_btn" style="background: #374151;">
                 ← Back to Orders
@@ -119,7 +135,29 @@
                     @foreach($order->items as $item)
                     <tr>
                         <td>{{ $loop->iteration }}</td>
-                        <td>{{ $item->food_name }}</td>
+                        <td>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                @if($item->food && $item->food->is_veg)
+                                    <span style="display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px; border:1.5px solid #16a34a; border-radius:3px; background:#fff; flex-shrink:0;" title="Pure Veg">
+                                        <span style="display:block; width:6px; height:6px; background:#16a34a; border-radius:50%;"></span>
+                                    </span>
+                                @elseif($item->food)
+                                    <span style="display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px; border:1.5px solid #b91c1c; border-radius:3px; background:#fff; flex-shrink:0;" title="Non-Veg">
+                                        <span style="display:block; width:0; height:0; border-left:3.5px solid transparent; border-right:3.5px solid transparent; border-bottom:6px solid #b91c1c;"></span>
+                                    </span>
+                                @endif
+                                <div>
+                                    <span style="font-weight:600; color:#111827;">{{ $item->food_name }}</span>
+                                    @if($item->customization_summary)
+                                        <div style="font-size:12px; color:#4b5563; margin-top:2px;">
+                                            <span style="background:#f3f4f6; color:#374151; padding:2px 7px; border-radius:4px; font-weight:500;">
+                                                {{ $item->customization_summary }}
+                                            </span>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </td>
                         <td>Rs. {{ number_format($item->price, 2) }}</td>
                         <td>{{ $item->quantity }}</td>
                         <td>Rs. {{ number_format($item->subtotal, 2) }}</td>
@@ -169,7 +207,17 @@
                 {{-- Driver Assignment Fields --}}
                 <div style="margin-top: 25px; padding-top: 20px; border-top: 1px dashed #e5e7eb; margin-bottom: 25px;">
                     <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 14px;">
-                        <h4 style="margin: 0; font-size: 15px; font-weight: 700; color: #111827;">🛵 Assign Delivery Partner (Optional)</h4>
+                        <h4 style="margin: 0; font-size: 15px; font-weight: 700; color: #111827; display: flex; align-items: center; gap: 7px;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="5.5" cy="17.5" r="3.5"></circle>
+                                <circle cx="18.5" cy="17.5" r="3.5"></circle>
+                                <path d="M15 6h4l2 5.5-2.5 1"></path>
+                                <path d="M9 17.5h6"></path>
+                                <path d="M12 9l-3 8.5"></path>
+                                <path d="M7 6h5"></path>
+                            </svg>
+                            Assign Delivery Partner (Optional)
+                        </h4>
                         <span style="font-size: 12px; color: #6b7280; background: #f3f4f6; padding: 2px 8px; border-radius: 4px;">
                             If unassigned, defaults to FoodieHub Support (+91 6284229435)
                         </span>

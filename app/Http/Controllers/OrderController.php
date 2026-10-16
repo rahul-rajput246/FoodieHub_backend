@@ -40,6 +40,39 @@ class OrderController extends Controller
         return view('user.orderDetails', compact('order'));
     }
 
+    private function resolveOrderItemPricing($food, $selectedVariation, $selectedAddons, $qty)
+    {
+        $unitPrice = (float) $food->food_price;
+        $summaryParts = [];
+
+        if (!empty($selectedVariation) && is_array($selectedVariation)) {
+            $varPrice = isset($selectedVariation['price']) ? (float)$selectedVariation['price'] : 0;
+            $unitPrice += $varPrice;
+            if (!empty($selectedVariation['name'])) {
+                $summaryParts[] = $selectedVariation['name'];
+            }
+        }
+
+        if (!empty($selectedAddons) && is_array($selectedAddons)) {
+            foreach ($selectedAddons as $addon) {
+                $addonPrice = isset($addon['price']) ? (float)$addon['price'] : 0;
+                $unitPrice += $addonPrice;
+                if (!empty($addon['name'])) {
+                    $summaryParts[] = "+ " . $addon['name'];
+                }
+            }
+        }
+
+        $subtotal = $unitPrice * $qty;
+        $summary = !empty($summaryParts) ? implode(', ', $summaryParts) : null;
+
+        return [
+            'unit_price' => $unitPrice,
+            'subtotal' => $subtotal,
+            'summary' => $summary,
+        ];
+    }
+
  public function store(Request $request)
 {
     $cartItems = CartItem::with('food')
@@ -58,10 +91,18 @@ class OrderController extends Controller
     }
 
     $subtotal = 0;
+    $itemPricing = [];
 
     foreach ($cartItems as $item) {
         if ($item->food) {
-            $subtotal += $item->food->food_price * $item->quantity;
+            $pricing = $this->resolveOrderItemPricing(
+                $item->food,
+                $item->selected_variation,
+                $item->selected_addons,
+                $item->quantity
+            );
+            $itemPricing[$item->id] = $pricing;
+            $subtotal += $pricing['subtotal'];
         }
     }
 
@@ -85,13 +126,23 @@ class OrderController extends Controller
             continue;
         }
 
+        $pricing = $itemPricing[$item->id] ?? $this->resolveOrderItemPricing(
+            $item->food,
+            $item->selected_variation,
+            $item->selected_addons,
+            $item->quantity
+        );
+
         OrderItem::create([
             'order_id' => $order->id,
             'food_item_id' => $item->food->id,
             'food_name' => $item->food->food_name,
-            'price' => $item->food->food_price,
+            'price' => $pricing['unit_price'],
             'quantity' => $item->quantity,
-            'subtotal' => $item->food->food_price * $item->quantity,
+            'subtotal' => $pricing['subtotal'],
+            'selected_variation' => $item->selected_variation,
+            'selected_addons' => $item->selected_addons,
+            'customization_summary' => $pricing['summary'],
         ]);
     }
 
@@ -112,6 +163,10 @@ class OrderController extends Controller
             'cart' => 'required|array|min:1',
             'cart.*.id' => 'required|exists:foodItems,id',
             'cart.*.qty' => 'required|integer|min:1',
+            'cart.*.cart_key' => 'nullable|string',
+            'cart.*.selected_variation' => 'nullable|array',
+            'cart.*.selected_addons' => 'nullable|array',
+            'cart.*.item_price' => 'nullable|numeric',
             'notes' => 'nullable|string',
             'coupon_code' => 'nullable|string',
         ]);
@@ -137,12 +192,20 @@ class OrderController extends Controller
         }
 
         $subtotal = 0;
+        $cartPricings = [];
 
-        foreach ($cart as $item) {
+        foreach ($cart as $index => $item) {
             $food = FoodItems::find($item['id']);
 
             if ($food) {
-                $subtotal += $food->food_price * $item['qty'];
+                $pricing = $this->resolveOrderItemPricing(
+                    $food,
+                    $item['selected_variation'] ?? null,
+                    $item['selected_addons'] ?? null,
+                    $item['qty']
+                );
+                $cartPricings[$index] = $pricing;
+                $subtotal += $pricing['subtotal'];
             }
         }
 
@@ -188,20 +251,30 @@ class OrderController extends Controller
             'notes' => $request->notes,
         ]);
 
-        foreach ($cart as $item) {
+        foreach ($cart as $index => $item) {
             $food = FoodItems::find($item['id']);
 
             if (!$food) {
                 continue;
             }
 
+            $pricing = $cartPricings[$index] ?? $this->resolveOrderItemPricing(
+                $food,
+                $item['selected_variation'] ?? null,
+                $item['selected_addons'] ?? null,
+                $item['qty']
+            );
+
             OrderItem::create([
                 'order_id' => $order->id,
                 'food_item_id' => $food->id,
                 'food_name' => $food->food_name,
-                'price' => $food->food_price,
+                'price' => $pricing['unit_price'],
                 'quantity' => $item['qty'],
-                'subtotal' => $food->food_price * $item['qty'],
+                'subtotal' => $pricing['subtotal'],
+                'selected_variation' => $item['selected_variation'] ?? null,
+                'selected_addons' => $item['selected_addons'] ?? null,
+                'customization_summary' => $pricing['summary'],
             ]);
         }
 
@@ -317,6 +390,10 @@ class OrderController extends Controller
         'cart' => 'required|array|min:1',
         'cart.*.id' => 'required|exists:foodItems,id',
         'cart.*.qty' => 'required|integer|min:1',
+        'cart.*.cart_key' => 'nullable|string',
+        'cart.*.selected_variation' => 'nullable|array',
+        'cart.*.selected_addons' => 'nullable|array',
+        'cart.*.item_price' => 'nullable|numeric',
         'notes' => 'nullable|string',
         'coupon_code' => 'nullable|string',
     ]);
@@ -334,12 +411,20 @@ class OrderController extends Controller
 
     $cart = $request->cart;
     $subtotal = 0;
+    $cartPricings = [];
 
-    foreach ($cart as $item) {
+    foreach ($cart as $index => $item) {
         $food = FoodItems::find($item['id']);
 
         if ($food) {
-            $subtotal += $food->food_price * $item['qty'];
+            $pricing = $this->resolveOrderItemPricing(
+                $food,
+                $item['selected_variation'] ?? null,
+                $item['selected_addons'] ?? null,
+                $item['qty']
+            );
+            $cartPricings[$index] = $pricing;
+            $subtotal += $pricing['subtotal'];
         }
     }
 
@@ -388,20 +473,30 @@ class OrderController extends Controller
             'notes' => $request->notes,
         ]);
 
-        foreach ($cart as $item) {
+        foreach ($cart as $index => $item) {
             $food = FoodItems::find($item['id']);
 
             if (!$food) {
                 continue;
             }
 
+            $pricing = $cartPricings[$index] ?? $this->resolveOrderItemPricing(
+                $food,
+                $item['selected_variation'] ?? null,
+                $item['selected_addons'] ?? null,
+                $item['qty']
+            );
+
             OrderItem::create([
                 'order_id' => $order->id,
                 'food_item_id' => $food->id,
                 'food_name' => $food->food_name,
-                'price' => $food->food_price,
+                'price' => $pricing['unit_price'],
                 'quantity' => $item['qty'],
-                'subtotal' => $food->food_price * $item['qty'],
+                'subtotal' => $pricing['subtotal'],
+                'selected_variation' => $item['selected_variation'] ?? null,
+                'selected_addons' => $item['selected_addons'] ?? null,
+                'customization_summary' => $pricing['summary'],
             ]);
         }
 
@@ -716,7 +811,7 @@ public function verifyRazorpayPayment(Request $request)
                 'key' => 'pending',
                 'title' => 'Order Placed',
                 'description' => 'We received your order and sent it to our kitchen.',
-                'icon' => '📝',
+                'icon' => 'order_placed',
                 'completed' => $currentStep >= 1 && $order->status !== 'cancelled',
                 'current' => $currentStep === 1,
                 'time' => $placedTime,
@@ -726,7 +821,7 @@ public function verifyRazorpayPayment(Request $request)
                 'key' => 'confirmed',
                 'title' => 'Order Confirmed',
                 'description' => 'Kitchen has accepted and queued your order.',
-                'icon' => '✅',
+                'icon' => 'order_confirmed',
                 'completed' => $currentStep >= 2 && $order->status !== 'cancelled',
                 'current' => $currentStep === 2,
                 'time' => $currentStep >= 2 ? $confirmedTime : 'Est ' . $confirmedTime,
@@ -736,7 +831,7 @@ public function verifyRazorpayPayment(Request $request)
                 'key' => 'preparing',
                 'title' => 'Preparing Food',
                 'description' => 'Our master chef is cooking your meal fresh.',
-                'icon' => '🍳',
+                'icon' => 'preparing',
                 'completed' => $currentStep >= 3 && $order->status !== 'cancelled',
                 'current' => $currentStep === 3,
                 'time' => $currentStep >= 3 ? $preparingTime : 'Est ' . $preparingTime,
@@ -746,7 +841,7 @@ public function verifyRazorpayPayment(Request $request)
                 'key' => 'out_for_delivery',
                 'title' => 'Out for Delivery',
                 'description' => 'Delivery rider is on the way with your hot meal.',
-                'icon' => '🛵',
+                'icon' => 'out_for_delivery',
                 'completed' => $currentStep >= 4 && $order->status !== 'cancelled',
                 'current' => $currentStep === 4,
                 'time' => $currentStep >= 4 ? $outForDeliveryTime : 'Est ' . $outForDeliveryTime,
@@ -756,7 +851,7 @@ public function verifyRazorpayPayment(Request $request)
                 'key' => 'delivered',
                 'title' => 'Delivered',
                 'description' => 'Order delivered at your doorstep. Enjoy your meal!',
-                'icon' => '🎉',
+                'icon' => 'delivered',
                 'completed' => $currentStep >= 5 && $order->status !== 'cancelled',
                 'current' => $currentStep === 5,
                 'time' => $currentStep >= 5 ? $deliveredTime : 'Est ' . $deliveredTime,

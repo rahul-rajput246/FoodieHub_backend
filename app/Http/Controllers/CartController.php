@@ -19,9 +19,8 @@ class CartController extends Controller
         $subtotal = 0;
 
         foreach ($cartItems as $item) {
-            if ($item->food) {
-                $subtotal += $item->food->food_price * $item->quantity;
-            }
+            $price = $item->item_price ?? ($item->food ? $item->food->food_price : 0);
+            $subtotal += $price * $item->quantity;
         }
 
         return view('user.cart', compact('cartItems', 'subtotal'));
@@ -37,9 +36,8 @@ class CartController extends Controller
         $subtotal = 0;
 
         foreach ($cartItems as $item) {
-            if ($item->food) {
-                $subtotal += $item->food->food_price * $item->quantity;
-            }
+            $price = $item->item_price ?? ($item->food ? $item->food->food_price : 0);
+            $subtotal += $price * $item->quantity;
         }
 
         return response()->json([
@@ -54,13 +52,27 @@ class CartController extends Controller
         $request->validate([
             'food_item_id' => 'required|exists:foodItems,id',
             'quantity' => 'required|integer|min:1',
+            'cart_key' => 'nullable|string',
+            'selected_variation' => 'nullable|array',
+            'selected_addons' => 'nullable|array',
+            'item_price' => 'nullable|numeric',
         ]);
 
         $food = FoodItems::findOrFail($request->food_item_id);
 
+        $cartKey = $request->cart_key ?: ('item_' . $food->id);
+        $itemPrice = $request->filled('item_price') ? (float)$request->item_price : (float)$food->food_price;
+
         $cartItem = CartItem::where('user_id', Auth::id())
-            ->where('food_item_id', $food->id)
+            ->where('cart_key', $cartKey)
             ->first();
+
+        if (!$cartItem && !$request->filled('cart_key')) {
+            $cartItem = CartItem::where('user_id', Auth::id())
+                ->where('food_item_id', $food->id)
+                ->whereNull('selected_variation')
+                ->first();
+        }
 
         if ($cartItem) {
             $cartItem->quantity += $request->quantity;
@@ -69,7 +81,11 @@ class CartController extends Controller
             CartItem::create([
                 'user_id' => Auth::id(),
                 'food_item_id' => $food->id,
+                'cart_key' => $cartKey,
                 'quantity' => $request->quantity,
+                'selected_variation' => $request->selected_variation,
+                'selected_addons' => $request->selected_addons,
+                'item_price' => $itemPrice,
             ]);
         }
 
@@ -91,7 +107,9 @@ class CartController extends Controller
 
         $cartItem = CartItem::where('user_id', Auth::id())
             ->where(function ($q) use ($id) {
-                $q->where('id', $id)->orWhere('food_item_id', $id);
+                $q->where('id', $id)
+                  ->orWhere('cart_key', $id)
+                  ->orWhere('food_item_id', $id);
             })
             ->first();
 
@@ -110,7 +128,9 @@ class CartController extends Controller
     {
         $cartItem = CartItem::where('user_id', Auth::id())
             ->where(function ($q) use ($id) {
-                $q->where('id', $id)->orWhere('food_item_id', $id);
+                $q->where('id', $id)
+                  ->orWhere('cart_key', $id)
+                  ->orWhere('food_item_id', $id);
             })
             ->first();
 
@@ -128,7 +148,6 @@ class CartController extends Controller
     {
         $cartItem = CartItem::findOrFail($id);
 
-        // Optional: make sure user owns this cart item
         if ($cartItem->user_id != auth()->id()) {
             abort(403);
         }
@@ -137,5 +156,4 @@ class CartController extends Controller
 
         return back()->with('success', 'Item removed from cart');
     }
-
 }

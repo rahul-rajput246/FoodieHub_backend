@@ -223,14 +223,29 @@
 
     <!-- Action Bar (Hidden on Print) -->
     <div class="action-bar">
-        <button onclick="window.print()" class="btn btn-print">
-            🖨️ Print Receipt
+        <button onclick="window.print()" class="btn btn-print" style="display: inline-flex; align-items: center; gap: 6px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                <rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
+            Print Receipt
         </button>
-        <a href="{{ route(request()->is('admin/*') ? 'admin.orders.invoice' : 'orders.invoice', $order->id) }}" class="btn btn-pdf">
-            📄 PDF Invoice
+        <a href="{{ route(request()->is('admin/*') ? 'admin.orders.invoice' : 'orders.invoice', $order->id) }}" class="btn btn-pdf" style="display: inline-flex; align-items: center; gap: 6px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="12" y1="18" x2="12" y2="12"></line>
+                <polyline points="9 15 12 18 15 15"></polyline>
+            </svg>
+            PDF Invoice
         </a>
-        <button onclick="window.close()" class="btn btn-back">
-            ✕ Close
+        <button onclick="window.close()" class="btn btn-back" style="display: inline-flex; align-items: center; gap: 6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+            Close
         </button>
     </div>
 
@@ -284,12 +299,24 @@
         @foreach($order->items as $item)
         <div class="item-row">
             <div class="item-main">
-                <span>{{ $item->food_name }}</span>
+                <span>
+                    @if($item->food && $item->food->is_veg)
+                        [VEG]
+                    @elseif($item->food)
+                        [NON-VEG]
+                    @endif
+                    {{ $item->food_name }}
+                </span>
                 <span>₹{{ number_format($item->subtotal, 2) }}</span>
             </div>
             <div class="item-sub">
                 <span>{{ $item->quantity }} x ₹{{ number_format($item->price, 2) }}</span>
             </div>
+            @if($item->customization_summary)
+            <div class="item-sub" style="font-size: 10px; color: #374151; font-style: italic;">
+                <span>↳ {{ $item->customization_summary }}</span>
+            </div>
+            @endif
         </div>
         @endforeach
 

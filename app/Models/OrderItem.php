@@ -13,7 +13,17 @@ class OrderItem extends Model
         'food_name',
         'price',
         'quantity',
-        'subtotal'
+        'subtotal',
+        'selected_variation',
+        'selected_addons',
+        'customization_summary',
+    ];
+
+    protected $casts = [
+        'selected_variation' => 'array',
+        'selected_addons' => 'array',
+        'price' => 'float',
+        'subtotal' => 'float',
     ];
 
     // Relationship: Item belongs to Order

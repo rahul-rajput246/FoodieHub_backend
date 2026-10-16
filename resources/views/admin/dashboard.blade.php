@@ -322,7 +322,13 @@
                             @empty
                                 <tr>
                                     <td colspan="6" style="text-align: center; padding: 35px 20px;">
-                                        <div style="font-size: 32px; margin-bottom: 8px;">🍽️</div>
+                                        <div style="display: flex; justify-content: center; margin-bottom: 12px; color: #ea580c;">
+                                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M18 2v20"></path>
+                                                <path d="M22 2v6a4 4 0 0 1-4 4v10"></path>
+                                                <path d="M6 2v7a3 3 0 0 1-3 3v8h6v-8a3 3 0 0 1-3-3V2"></path>
+                                            </svg>
+                                        </div>
                                         <h4 style="font-size: 16px; margin-bottom: 6px;">No orders placed yet</h4>
                                         <p style="color: #6b7280; font-size: 13px; margin-bottom: 16px;">Delicious food is waiting for you! Browse our menu to make your first order.</p>
                                         <a href="http://localhost:5173/Menu" class="dashboard_top_btn" style="padding: 8px 18px; font-size: 13px;">Explore Menu</a>

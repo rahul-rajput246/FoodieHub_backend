@@ -250,7 +250,11 @@
             <!-- Header -->
             <div class="email-header">
                 <div class="brand-logo">FoodieHub</div>
-                <div class="header-icon">🎉</div>
+                <div class="header-icon" style="display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,0.2); margin: 8px auto;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
                 <h1 class="header-title">Order Confirmed!</h1>
                 <p class="header-subtitle">Your food is being freshly prepared in our kitchen</p>
             </div>
@@ -356,8 +360,15 @@
                 </div>
 
                 <!-- Invoice Attached Banner -->
-                <div class="invoice-notice">
-                    <span>📄</span>
+                <div class="invoice-notice" style="display: flex; align-items: flex-start; gap: 10px;">
+                    <span style="display: inline-flex; align-items: center; margin-top: 2px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </span>
                     <div>
                         <strong>PDF Invoice Attached:</strong><br>
                         We have attached your official Tax Invoice (PDF) to this email for your records and easy reimbursement.
