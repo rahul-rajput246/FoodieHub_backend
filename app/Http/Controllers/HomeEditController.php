@@ -22,9 +22,7 @@ class HomeEditController extends Controller
                 $home = new HomeEdit();
             }
 
-            $oldContent = $home->content ?? [];
-
-            $data = [];
+            $data = $oldContent;
 
             // Home Banner
 

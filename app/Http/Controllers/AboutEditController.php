@@ -12,23 +12,30 @@ class AboutEditController extends Controller
         $about = HomeEdit::where('pages' , 'about')->first();
         $content = $about->content ?? [];
 
+        // Ensure both case formats are available
+        if(isset($content['about_our_story']) && !isset($content['About_Our_Story'])){
+            $content['About_Our_Story'] = $content['about_our_story'];
+        } elseif(isset($content['About_Our_Story']) && !isset($content['about_our_story'])){
+            $content['about_our_story'] = $content['About_Our_Story'];
+        }
+
         $about_spec = $content['about_special']['items'] ?? [];
 
-        return view('admin.pages.aboutForm' , compact('about' , 'content' , 'about_spec'));
+        return view('admin.pages.aboutform' , compact('about' , 'content' , 'about_spec'));
 
     }
 
     public function aboutUpdate(Request $request){
 
-        $about = HomeEdit::where('pages', $request->pages)->first();
+        $about = HomeEdit::where('pages', 'about')->first();
 
         if(!$about){
             $about = new HomeEdit();
+            $about->pages = 'about';
         }
 
         $oldContent = $about->content ?? [];
 
-        
         // About Banner
 
         $aboutData = [];
@@ -43,7 +50,6 @@ class AboutEditController extends Controller
             'btn_url1' => $request->about_banner_btn1_link,
             'btn_text2' => $request->about_banner_btn2_text,
             'btn_url2' => $request->about_banner_btn2_link,
-            'banner_img' => $request->about_banner_image,
         ];
 
         if($request->hasFile('about_banner_image')){
@@ -54,9 +60,7 @@ class AboutEditController extends Controller
 
         // About Our Story
 
-        $aos = [];
-
-        $aboutData['about_our_story'] = [
+        $storyData = [
             'subtitle' => $request->about_our_story_subtitle,
             'title' => $request->about_our_story_title,
             'desc1' => $request->about_our_story_description1,
@@ -66,10 +70,14 @@ class AboutEditController extends Controller
         ];
 
         if($request->hasFile('about_our_story_image')){
-            $aboutData['about_our_story']['image'] = $request->file('about_our_story_image')->store('uploads' , 'public');
-        } else{
-            $aboutData['about_our_story']['image'] = $oldContent['about_our_story']['image'] ?? null;
+            $storyData['image'] = $request->file('about_our_story_image')->store('uploads' , 'public');
+        } else {
+            $storyData['image'] = $oldContent['about_our_story']['image'] ?? ($oldContent['About_Our_Story']['image'] ?? null);
         }
+
+        // Populate both casing versions for frontend and blade compatibility
+        $aboutData['about_our_story'] = $storyData;
+        $aboutData['About_Our_Story'] = $storyData;
 
        // About Our Specialities
 
@@ -105,8 +113,6 @@ class AboutEditController extends Controller
 
         // About Special Offer Section
 
-        $about_special_offer = [];
-
         $aboutData['aboutOffer'] = [
             'subtitle' => $request->about_offer_subtitle,
             'title' => $request->about_offer_title,
@@ -118,7 +124,7 @@ class AboutEditController extends Controller
         ];
 
         HomeEdit::updateOrCreate(
-            ['pages' => $request->pages],
+            ['pages' => 'about'],
             ['content' => $aboutData]
         );
 

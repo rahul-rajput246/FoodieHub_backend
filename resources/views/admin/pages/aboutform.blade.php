@@ -2,6 +2,13 @@
 
 @section('content')
 
+@php
+    $banner = $content['about_banner'] ?? [];
+    $story = $content['about_our_story'] ?? $content['About_Our_Story'] ?? [];
+    $special = $content['about_special'] ?? [];
+    $offer = $content['aboutOffer'] ?? [];
+@endphp
+
 <div class="main_dashboard">
 
     <div class="pages_header">
@@ -9,9 +16,14 @@
             <p class="dashboard_small_text">FoodieHub Admin</p>
             <h1>Manage About Page</h1>
             <p class="pages_desc">
-                Update aboutpage banner, section headings, special offer content, and testimonial section text.
+                Update about page banner, our story section, specialities cards, and special offer banner.
             </p>
         </div>
+        @if(session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+        @endif
     </div>
 
     <form action="{{ route('about_update') }}" method="POST" enctype="multipart/form-data" class="page_form_wrapper">
@@ -35,44 +47,44 @@
                     <div class="form_group">
                         <label>Banner Subtitle</label>
                         <input type="text" name="about_banner_subtitle" placeholder="Enter banner subtitle"
-                            value="{{ old('subtitle' , $content['about_banner']['subtitle']) }}">
+                            value="{{ old('about_banner_subtitle', $banner['subtitle'] ?? '') }}">
                     </div>
 
                     <div class="form_group">
                         <label>Banner Title First</label>
                         <input type="text" name="about_banner_title" placeholder="Enter first title"
-                            value="{{ old('title1' , $content['about_banner']['title1']) }}">
+                            value="{{ old('about_banner_title', $banner['title1'] ?? '') }}">
                     </div>
 
                     <div class="form_group">
                         <label>Banner Title Second ( color title )</label>
                         <input type="text" name="about_banner_title_second" placeholder="Enter second title"
-                            value="{{ old('title2', $content['about_banner']['title2']) }}">
+                            value="{{ old('about_banner_title_second', $banner['title2'] ?? '') }}">
                     </div>
 
                     <div class="form_group">
                         <label>Banner Title Third</label>
                         <input type="text" name="about_banner_title_third" placeholder="Enter third title"
-                            value="{{ old('color_title', $content['about_banner']['color_title']) }}">
+                            value="{{ old('about_banner_title_third', $banner['color_title'] ?? '') }}">
                     </div>
 
                     <div class="form_group">
                         <label>Banner Description</label>
                         <textarea name="about_banner_description" rows="4"
-                            placeholder="Enter banner description">{{ old('desc', $content['about_banner']['desc'] ?? '') }}</textarea>
+                            placeholder="Enter banner description">{{ old('about_banner_description', $banner['desc'] ?? '') }}</textarea>
                     </div>
 
                     <div class="form_row_2">
                         <div class="form_group">
                             <label>Button 1 Text</label>
                             <input type="text" name="about_banner_btn1_text" placeholder="Enter button 1 text"
-                                value="{{ old('btn_text1', $content['about_banner']['btn_text1']) }}">
+                                value="{{ old('about_banner_btn1_text', $banner['btn_text1'] ?? '') }}">
                         </div>
 
                         <div class="form_group">
                             <label>Button 1 Link</label>
                             <input type="text" name="about_banner_btn1_link" placeholder="/cart"
-                                value="{{ old('btn_url1', $content['about_banner']['btn_url1']) }}">
+                                value="{{ old('about_banner_btn1_link', $banner['btn_url1'] ?? '') }}">
                         </div>
                     </div>
 
@@ -80,27 +92,28 @@
                         <div class="form_group">
                             <label>Button 2 Text</label>
                             <input type="text" name="about_banner_btn2_text" placeholder="Enter button 2 text"
-                                value="{{ old('btn_text2', $content['about_banner']['btn_text2']) }}">
+                                value="{{ old('about_banner_btn2_text', $banner['btn_text2'] ?? '') }}">
                         </div>
 
                         <div class="form_group">
                             <label>Button 2 Link</label>
                             <input type="text" name="about_banner_btn2_link" placeholder="/contact"
-                                value="{{ old('btn_url2', $content['about_banner']['btn_url2']) }}">
+                                value="{{ old('about_banner_btn2_link', $banner['btn_url2'] ?? '') }}">
                         </div>
                     </div>
 
                     <div class="form_group">
 
-                        @if(!empty($content['about_banner']['image']))
+                        @if(!empty($banner['image']))
                         <div style="margin-bottom:10px;">
-                            <img src="{{ asset('storage/' . $content['about_banner']['image'] ?? '') }}" width="120"
-                                height="120" object-fit=contain alt="About Banner">
+                            <img src="{{ asset('storage/' . $banner['image']) }}" width="140"
+                                height="100" style="object-fit: cover; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 4px 12px rgba(0,0,0,0.06);" alt="About Banner">
+                            <p style="font-size: 12px; color: #6b7280; margin-top: 4px;">Current banner image</p>
                         </div>
                         @endif
 
                         <label>Banner Image</label>
-                        <input type="file" name="about_banner_image">
+                        <input type="file" name="about_banner_image" accept="image/*">
                     </div>
                 </div>
             </div>
@@ -111,60 +124,59 @@
 
                 <div class="form_card_title_row">
                     <h3>About Our Story</h3>
-                    <p>Main hero section content</p>
+                    <p>Story section content and photo</p>
                 </div>
 
                 <div class="page_form_card">
 
                     <div class="form_group">
                         <label>Our Story Subtitle</label>
-                        <input type="text" name="about_our_story_subtitle" placeholder="Enter banner subtitle"
-                            value="{{ old('subtitle' , $content['About_Our_Story']['subtitle']) }}">
+                        <input type="text" name="about_our_story_subtitle" placeholder="Enter story subtitle"
+                            value="{{ old('about_our_story_subtitle', $story['subtitle'] ?? '') }}">
                     </div>
 
                     <div class="form_group">
                         <label>Our Story Title</label>
-                        <input type="text" name="about_our_story_title" placeholder="Enter title"
-                            value="{{ old('title',$content['About_Our_Story']['title']) }}">
+                        <input type="text" name="about_our_story_title" placeholder="Enter story title"
+                            value="{{ old('about_our_story_title', $story['title'] ?? '') }}">
                     </div>
 
                     <div class="form_group">
                         <label>Our Story Description 1</label>
-                        <input type="text" name="about_our_story_description1" placeholder="Enter description 1"
-                            value="{{ old('desc1',$content['About_Our_Story']['desc1']) }}">
+                        <textarea name="about_our_story_description1" rows="3" placeholder="Enter description 1">{{ old('about_our_story_description1', $story['desc1'] ?? '') }}</textarea>
                     </div>
 
                     <div class="form_group">
                         <label>Our Story Description 2</label>
-                        <input type="text" name="about_our_story_description2" placeholder="Enter description 2"
-                            value="{{ old('desc2',$content['About_Our_Story']['desc2']) }}">
+                        <textarea name="about_our_story_description2" rows="3" placeholder="Enter description 2">{{ old('about_our_story_description2', $story['desc2'] ?? '') }}</textarea>
                     </div>
 
                     <div class="form_row_2">
                         <div class="form_group">
                             <label>Button 1 Text</label>
                             <input type="text" name="about_our_story_btn1_text" placeholder="Enter button 1 text"
-                                value="{{ old('btn_text',$content['About_Our_Story']['btn_text']) }}">
+                                value="{{ old('about_our_story_btn1_text', $story['btn_text'] ?? '') }}">
                         </div>
 
                         <div class="form_group">
                             <label>Button 1 Link</label>
                             <input type="text" name="about_our_story_btn1_link" placeholder="/menu"
-                                value="{{ old('btn_url',$content['About_Our_Story']['btn_url']) }}">
+                                value="{{ old('about_our_story_btn1_link', $story['btn_url'] ?? '') }}">
                         </div>
                     </div>
 
                     <div class="form_group">
 
-                        @if(!empty($content['about_banner']['image'] ?? ''))
+                        @if(!empty($story['image']))
                         <div style="margin-bottom:10px;">
-                            <img src="{{ asset('storage/' . $content['about_our_story']['image'] ?? '') }}" width="120"
-                                height="120" object-fit=contain alt="About Banner">
+                            <img src="{{ asset('storage/' . $story['image']) }}" width="140"
+                                height="100" style="object-fit: cover; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 4px 12px rgba(0,0,0,0.06);" alt="Our Story Image">
+                            <p style="font-size: 12px; color: #6b7280; margin-top: 4px;">Current story image</p>
                         </div>
                         @endif
 
                         <label>Our Story Image</label>
-                        <input type="file" name="about_our_story_image">
+                        <input type="file" name="about_our_story_image" accept="image/*">
                     </div>
 
                 </div>
@@ -176,69 +188,65 @@
 
                 <div class="form_card_title_row">
                     <h3>About Our Specialities</h3>
-                    <p>Main hero section content</p>
+                    <p>What we serve cards and icons</p>
                 </div>
 
                 <div class="page_form_card about_spec_box">
 
                     <div class="form_group">
                         <label>Our Specialities Subtitle</label>
-                        <input type="text" name="about_our_spec_subtitle" placeholder="Enter banner subtitle"
-                            value="{{ old('subtitle' , $content['about_special']['subtitle']) }}">
+                        <input type="text" name="about_our_spec_subtitle" placeholder="Enter specialities subtitle"
+                            value="{{ old('about_our_spec_subtitle', $special['subtitle'] ?? '') }}">
                     </div>
 
                     <div class="form_group">
                         <label>Our Specialities Title</label>
                         <input type="text" name="about_our_spec_title" placeholder="Enter title"
-                            value="{{ old('title', $content['about_special']['title']) }}">
+                            value="{{ old('about_our_spec_title', $special['title'] ?? '') }}">
                     </div>
 
                     <div class="form_group">
                         <label>Our Specialities Description</label>
-                        <input type="text" name="about_our_spec_description" placeholder="Enter description"
-                            value="{{ old('desc', $content['about_special']['desc']) }}">
+                        <textarea name="about_our_spec_description" rows="3" placeholder="Enter description">{{ old('about_our_spec_description', $special['desc'] ?? '') }}</textarea>
                     </div>
 
                     @php
-
-                    $about_spec = old('about_spec_items' , $content['about_special']['items'] ?? []);
-
-                    if(count($about_spec) < 4){ $about_spec=array_pad($about_spec , 4 , ['box_title'=> '' , 'box_desc'
-                        => '']);
+                        $about_spec = old('about_spec_items', $special['items'] ?? []);
+                        if(count($about_spec) < 4){
+                            $about_spec = array_pad($about_spec, 4, ['box_title' => '', 'box_desc' => '']);
                         }
+                    @endphp
 
-                        @endphp
+                    @foreach($about_spec as $index => $item)
 
-                        @foreach($about_spec as $index => $item)
+                        <div class="form_group faq_box" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #f3f4f6;">
+                            <label>Our Specialities Box {{ $index + 1 }} Title</label>
+                            <input type="text" name="about_spec_items[{{ $index }}][box_title]"
+                                placeholder="Enter card title" value="{{ $item['box_title'] ?? '' }}">
+                        </div>
 
-                            <div class="form_group faq_box">
-                                <label>Our Specialities Box {{ $index + 1 }}</label>
-                                <input type="text" name="about_spec_items[{{ $index }}][box_title]"
-                                    placeholder="Enter banner subtitle" value="{{ $item['box_title'] ?? '' }}">
+                        <div class="form_group">
+                            <label>Our Specialities Box {{ $index + 1 }} Description</label>
+                            <input type="text" name="about_spec_items[{{ $index }}][box_desc]"
+                                placeholder="Enter card description" value="{{ $item['box_desc'] ?? '' }}">
+                        </div>
+
+                        <div class="form_group">
+
+                            @if(!empty($item['image']))
+                            <div style="margin-bottom:10px;">
+                                <img src="{{ asset('storage/' . $item['image']) }}"
+                                    width="100" height="70" style="object-fit: cover; border-radius: 8px; border: 1px solid #e5e7eb;" alt="Card Image">
                             </div>
+                            @endif
 
-                            <div class="form_group">
-                                <label>Our Specialities Box {{ $index + 1 }}</label>
-                                <input type="text" name="about_spec_items[{{ $index }}][box_desc]"
-                                    placeholder="Enter banner subtitle" value="{{ $item['box_desc'] ?? '' }}">
-                            </div>
+                            <input type="hidden" name="about_spec_items[{{ $index }}][old_image]" value="{{ $item['image'] ?? '' }}">
 
-                            <div class="form_group">
+                            <label>Speciality Image {{ $index + 1 }}</label>
+                            <input type="file" name="about_spec_items[{{ $index }}][image]" accept="image/*">
+                        </div>
 
-                                @if(!empty($item['image']))
-                                <div style="margin-bottom:10px;">
-                                    <img src="{{ asset('storage/' . $item['image']) }}"
-                                        width="80" height="50" object-fit=contain alt="About Banner">
-                                </div>
-                                @endif
-
-                                <input type="hidden" name="about_spec_items[{{ $index }}][old_image]" value="{{ $item['image'] ?? '' }}">
-
-                                <label>Our Specialisation Image {{ $index + 1 }}</label>
-                                <input type="file" name="about_spec_items[{{ $index }}][image]">
-                            </div>
-
-                        @endforeach
+                    @endforeach
 
                 </div>
 
@@ -247,6 +255,7 @@
                 </div>
 
             </div>
+
 
             <!-- SPECIAL OFFER -->
 
@@ -262,46 +271,46 @@
                     <div class="form_group">
                         <label>About Offer Subtitle</label>
                         <input type="text" name="about_offer_subtitle" placeholder="Enter offer subtitle"
-                            value="{{ old('subtitle',$content['aboutOffer']['subtitle'] ?? '') }}">
+                            value="{{ old('about_offer_subtitle', $offer['subtitle'] ?? '') }}">
                     </div>
 
                     <div class="form_group">
                         <label>About Offer Title</label>
                         <input type="text" name="about_offer_title" placeholder="Enter offer title"
-                            value="{{ old('title',$content['aboutOffer']['subtitle'] ?? '') }}">
+                            value="{{ old('about_offer_title', $offer['title'] ?? '') }}">
                     </div>
 
                     <div class="form_group">
                         <label>About Offer Description</label>
                         <textarea name="about_offer_description" rows="4"
-                            placeholder="Enter offer description">{{ old('desc',$content['aboutOffer']['desc'] ?? '') }}</textarea>
+                            placeholder="Enter offer description">{{ old('about_offer_description', $offer['desc'] ?? '') }}</textarea>
                     </div>
 
                     <div class="form_row_2">
                         <div class="form_group">
                             <label>About Offer Button Text</label>
                             <input type="text" name="about_offer_btn_text" placeholder="Order Now"
-                                value="{{ old('btn_text1',$content['aboutOffer']['btn_text1'] ?? '') }}">
+                                value="{{ old('about_offer_btn_text', $offer['btn_text1'] ?? '') }}">
                         </div>
 
                         <div class="form_group">
                             <label>Offer Button Link</label>
                             <input type="text" name="about_offer_btn_link" placeholder="/cart"
-                                value="{{ old('btn_url1',$content['aboutOffer']['btn_url1'] ?? '') }}">
+                                value="{{ old('about_offer_btn_link', $offer['btn_url1'] ?? '') }}">
                         </div>
                     </div>
 
                     <div class="form_row_2">
                         <div class="form_group">
                             <label>About Offer Button Text 2</label>
-                            <input type="text" name="about_offer_btn_text2" placeholder="Order Now"
-                                value="{{ old('btn_text2',$content['aboutOffer']['btn_text2'] ?? '') }}">
+                            <input type="text" name="about_offer_btn_text2" placeholder="Explore Menu"
+                                value="{{ old('about_offer_btn_text2', $offer['btn_text2'] ?? '') }}">
                         </div>
 
                         <div class="form_group">
                             <label>Offer Button Link 2</label>
                             <input type="text" name="about_offer_btn_link2" placeholder="/menu"
-                                value="{{ old('btn_url2',$content['aboutOffer']['btn_url2'] ?? '') }}">
+                                value="{{ old('about_offer_btn_link2', $offer['btn_url2'] ?? '') }}">
                         </div>
                     </div>
 
@@ -309,9 +318,10 @@
             </div>
 
             <div class="page_form_submit_box">
-                <button type="submit" class="save_page_btn">Save about Page Content</button>
+                <button type="submit" class="save_page_btn">Save About Page Content</button>
             </div>
 
+        </div>
     </form>
 
     @include('components.usable.footer')
