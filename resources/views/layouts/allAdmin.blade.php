@@ -204,6 +204,7 @@
             $('.home_testom_box').append(testomHtml);
 
             testomIndex++;
+            setupDragAndDropUploaders();
 
         });
 
@@ -326,6 +327,7 @@
             $('.about_spec_box').append(aboutSpecHtml);
 
             aboutSpecIndex++;
+            setupDragAndDropUploaders();
 
         });
 
@@ -334,6 +336,141 @@
         $(document).on('click', '.remove_about_spec', function() {
             $(this).closest('.faq_box').remove();
         });
+
+        // =========================================================
+        // UNIVERSAL DRAG AND DROP FILE UPLOADER
+        // =========================================================
+        function setupDragAndDropUploaders() {
+            $('input[type="file"]:not(.dropzone_initialized)').each(function() {
+                const $input = $(this);
+                $input.addClass('dropzone_initialized dropzone_hidden_input');
+
+                // Check for existing image in the surrounding form group or card
+                const $formGroup = $input.closest('.form_group, .page_form_card, .allfood_card_img_box');
+                let existingImgSrc = '';
+
+                if ($formGroup.length) {
+                    const $img = $formGroup.find('img').first();
+                    if ($img.length && $img.attr('src')) {
+                        existingImgSrc = $img.attr('src');
+                        // Hide old image wrapper if it's separate from dropzone
+                        const $oldImgWrapper = $img.parent('div');
+                        if ($oldImgWrapper.length && $oldImgWrapper[0] !== $formGroup[0]) {
+                            $oldImgWrapper.hide();
+                        } else {
+                            $img.hide();
+                        }
+                    }
+                }
+
+                const $dropzone = $(`
+                    <div class="dropzone_box" tabindex="0">
+                        <div class="dropzone_default_content">
+                            <div class="dropzone_icon_wrapper">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+                                </svg>
+                            </div>
+                            <p class="dropzone_prompt">Drag & drop your image here, or <strong>Browse</strong></p>
+                            <p class="dropzone_subtext">Supports PNG, JPG, WEBP, SVG</p>
+                        </div>
+                    </div>
+                `);
+
+                function updatePreview(src, name = '', size = '', isNew = false) {
+                    if (src) {
+                        $dropzone.html(`
+                            <div class="dropzone_preview_wrapper">
+                                <img src="${src}" alt="Preview" class="dropzone_preview_thumb">
+                                <div class="dropzone_preview_info">
+                                    <span class="dropzone_preview_badge ${isNew ? 'badge_new' : 'badge_current'}">
+                                        ${isNew ? '✓ New Image Selected' : 'Current Image'}
+                                    </span>
+                                    <p class="dropzone_preview_name">${name || 'Uploaded Image'}</p>
+                                    <p class="dropzone_preview_size">${size || 'Drag & drop or click to replace'}</p>
+                                </div>
+                                <button type="button" class="dropzone_change_btn">Change</button>
+                            </div>
+                        `);
+                    } else {
+                        $dropzone.html(`
+                            <div class="dropzone_default_content">
+                                <div class="dropzone_icon_wrapper">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+                                    </svg>
+                                </div>
+                                <p class="dropzone_prompt">Drag & drop your image here, or <strong>Browse</strong></p>
+                                <p class="dropzone_subtext">Supports PNG, JPG, WEBP, SVG</p>
+                            </div>
+                        `);
+                    }
+                }
+
+                if (existingImgSrc) {
+                    updatePreview(existingImgSrc, '', '', false);
+                }
+
+                $input.after($dropzone);
+
+                // Clicking anywhere on the dropzone triggers the file input
+                $dropzone.on('click', function() {
+                    $input.trigger('click');
+                });
+
+                // Keyboard support
+                $dropzone.on('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        $input.trigger('click');
+                    }
+                });
+
+                // Drag & Drop event handling
+                $dropzone.on('dragenter dragover', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    $dropzone.addClass('drag_over');
+                });
+
+                $dropzone.on('dragleave dragend drop', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    $dropzone.removeClass('drag_over');
+                });
+
+                $dropzone.on('drop', function(e) {
+                    const files = e.originalEvent.dataTransfer.files;
+                    if (files && files.length > 0) {
+                        const file = files[0];
+                        if (file.type.match(/^image\//i)) {
+                            const dt = new DataTransfer();
+                            dt.items.add(file);
+                            $input[0].files = dt.files;
+                            $input.trigger('change');
+                        } else {
+                            alert('Please upload a valid image file (PNG, JPG, WEBP, SVG).');
+                        }
+                    }
+                });
+
+                // File input change (via Browse dialog or Drag & Drop)
+                $input.on('change', function() {
+                    if (this.files && this.files[0]) {
+                        const file = this.files[0];
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const sizeFormatted = (file.size / 1024).toFixed(1) + ' KB';
+                            updatePreview(e.target.result, file.name, sizeFormatted, true);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            });
+        }
+
+        // Initialize drag & drop uploader on page load
+        setupDragAndDropUploaders();
 
     });
     </script>
