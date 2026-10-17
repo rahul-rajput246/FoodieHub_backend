@@ -75,6 +75,14 @@ class User extends Authenticatable
         return $this->hasMany(WishlistItem::class);
     }
 
-    
-
+    /**
+     * Send the password reset notification with FoodieHub branding.
+     *
+     * @param  string  $token
+     * @return void
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new \App\Notifications\FoodieHubResetPasswordNotification($token));
+    }
 }

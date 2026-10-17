@@ -309,6 +309,45 @@ body.auth-theme {
     background: var(--fh-white);
 }
 
+.auth-password-wrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.auth-password-wrapper .auth-input {
+    padding-right: 46px;
+}
+
+.auth-password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    padding: 6px;
+    cursor: pointer;
+    color: #6b7280;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: color 0.2s ease, background-color 0.2s ease;
+    line-height: 1;
+}
+
+.auth-password-toggle:hover {
+    color: var(--fh-orange);
+    background-color: rgba(255, 126, 0, 0.08);
+}
+
+.auth-password-toggle:focus {
+    outline: none;
+    color: var(--fh-orange);
+}
+
 .auth-error {
     margin: 6px 0 0;
     color: #dc2626;

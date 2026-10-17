@@ -42,34 +42,74 @@ class OrderController extends Controller
 
     private function resolveOrderItemPricing($food, $selectedVariation, $selectedAddons, $qty)
     {
+        // 1. Base price is ALWAYS taken from the database record
         $unitPrice = (float) $food->food_price;
         $summaryParts = [];
+        $verifiedVariation = null;
+        $verifiedAddons = [];
 
+        // 2. Authenticate variation against DB variations array
         if (!empty($selectedVariation) && is_array($selectedVariation)) {
-            $varPrice = isset($selectedVariation['price']) ? (float)$selectedVariation['price'] : 0;
-            $unitPrice += $varPrice;
-            if (!empty($selectedVariation['name'])) {
-                $summaryParts[] = $selectedVariation['name'];
+            $clientVarId = (string)($selectedVariation['id'] ?? '');
+            $dbVariations = is_array($food->variations) ? $food->variations : [];
+            $foundVar = null;
+
+            foreach ($dbVariations as $v) {
+                if ((string)($v['id'] ?? '') === $clientVarId) {
+                    $foundVar = $v;
+                    break;
+                }
+            }
+
+            if ($foundVar) {
+                $varPrice = (float)($foundVar['price'] ?? 0);
+                $unitPrice += $varPrice;
+                $varName = $foundVar['name'] ?? ($selectedVariation['name'] ?? 'Variation');
+                $summaryParts[] = $varName;
+                $verifiedVariation = [
+                    'id' => $foundVar['id'],
+                    'name' => $varName,
+                    'price' => $varPrice,
+                ];
             }
         }
 
+        // 3. Authenticate addons against DB addons array
         if (!empty($selectedAddons) && is_array($selectedAddons)) {
-            foreach ($selectedAddons as $addon) {
-                $addonPrice = isset($addon['price']) ? (float)$addon['price'] : 0;
-                $unitPrice += $addonPrice;
-                if (!empty($addon['name'])) {
-                    $summaryParts[] = "+ " . $addon['name'];
+            $dbAddons = is_array($food->addons) ? $food->addons : [];
+            $clientAddonIds = [];
+            foreach ($selectedAddons as $a) {
+                if (isset($a['id'])) {
+                    $clientAddonIds[] = (string)$a['id'];
+                }
+            }
+
+            foreach ($dbAddons as $dbA) {
+                $dbAId = (string)($dbA['id'] ?? '');
+                if (in_array($dbAId, $clientAddonIds, true)) {
+                    $addonPrice = (float)($dbA['price'] ?? 0);
+                    $unitPrice += $addonPrice;
+                    $addonName = $dbA['name'] ?? 'Addon';
+                    $summaryParts[] = "+ " . $addonName;
+                    $verifiedAddons[] = [
+                        'id' => $dbA['id'],
+                        'name' => $addonName,
+                        'price' => $addonPrice,
+                    ];
                 }
             }
         }
 
-        $subtotal = $unitPrice * $qty;
+        $qtySafe = max(1, (int)$qty);
+        $subtotal = $unitPrice * $qtySafe;
         $summary = !empty($summaryParts) ? implode(', ', $summaryParts) : null;
 
         return [
             'unit_price' => $unitPrice,
             'subtotal' => $subtotal,
             'summary' => $summary,
+            'verified_variation' => $verifiedVariation,
+            'verified_addons' => $verifiedAddons,
         ];
     }
 

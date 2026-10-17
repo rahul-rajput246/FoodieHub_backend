@@ -9,6 +9,59 @@ use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
 {
+    private function calculateVerifiedItemPrice($food, $selectedVariation, $selectedAddons): array
+    {
+        $unitPrice = (float) $food->food_price;
+        $verifiedVariation = null;
+        $verifiedAddons = [];
+
+        if (!empty($selectedVariation) && is_array($selectedVariation)) {
+            $clientVarId = (string)($selectedVariation['id'] ?? '');
+            $dbVariations = is_array($food->variations) ? $food->variations : [];
+            foreach ($dbVariations as $v) {
+                if ((string)($v['id'] ?? '') === $clientVarId) {
+                    $varPrice = (float)($v['price'] ?? 0);
+                    $unitPrice += $varPrice;
+                    $verifiedVariation = [
+                        'id' => $v['id'],
+                        'name' => $v['name'] ?? ($selectedVariation['name'] ?? ''),
+                        'price' => $varPrice,
+                    ];
+                    break;
+                }
+            }
+        }
+
+        if (!empty($selectedAddons) && is_array($selectedAddons)) {
+            $dbAddons = is_array($food->addons) ? $food->addons : [];
+            $clientAddonIds = [];
+            foreach ($selectedAddons as $a) {
+                if (isset($a['id'])) {
+                    $clientAddonIds[] = (string)$a['id'];
+                }
+            }
+
+            foreach ($dbAddons as $dbA) {
+                $dbAId = (string)($dbA['id'] ?? '');
+                if (in_array($dbAId, $clientAddonIds, true)) {
+                    $addonPrice = (float)($dbA['price'] ?? 0);
+                    $unitPrice += $addonPrice;
+                    $verifiedAddons[] = [
+                        'id' => $dbA['id'],
+                        'name' => $dbA['name'] ?? '',
+                        'price' => $addonPrice,
+                    ];
+                }
+            }
+        }
+
+        return [
+            'unit_price' => $unitPrice,
+            'variation' => $verifiedVariation,
+            'addons' => $verifiedAddons,
+        ];
+    }
+
     public function index()
     {
         $cartItems = CartItem::with('food')
@@ -19,6 +72,10 @@ class CartController extends Controller
         $subtotal = 0;
 
         foreach ($cartItems as $item) {
+            if ($item->food) {
+                $calc = $this->calculateVerifiedItemPrice($item->food, $item->selected_variation, $item->selected_addons);
+                $item->item_price = $calc['unit_price'];
+            }
             $price = $item->item_price ?? ($item->food ? $item->food->food_price : 0);
             $subtotal += $price * $item->quantity;
         }
@@ -36,6 +93,10 @@ class CartController extends Controller
         $subtotal = 0;
 
         foreach ($cartItems as $item) {
+            if ($item->food) {
+                $calc = $this->calculateVerifiedItemPrice($item->food, $item->selected_variation, $item->selected_addons);
+                $item->item_price = $calc['unit_price'];
+            }
             $price = $item->item_price ?? ($item->food ? $item->food->food_price : 0);
             $subtotal += $price * $item->quantity;
         }
@@ -60,8 +121,13 @@ class CartController extends Controller
 
         $food = FoodItems::findOrFail($request->food_item_id);
 
+        // Always verify and compute item price on the server directly from DB
+        $calc = $this->calculateVerifiedItemPrice($food, $request->selected_variation, $request->selected_addons);
+        $itemPrice = $calc['unit_price'];
+        $verifiedVariation = $calc['variation'];
+        $verifiedAddons = $calc['addons'];
+
         $cartKey = $request->cart_key ?: ('item_' . $food->id);
-        $itemPrice = $request->filled('item_price') ? (float)$request->item_price : (float)$food->food_price;
 
         $cartItem = CartItem::where('user_id', Auth::id())
             ->where('cart_key', $cartKey)
@@ -76,6 +142,7 @@ class CartController extends Controller
 
         if ($cartItem) {
             $cartItem->quantity += $request->quantity;
+            $cartItem->item_price = $itemPrice;
             $cartItem->save();
         } else {
             CartItem::create([
@@ -83,8 +150,8 @@ class CartController extends Controller
                 'food_item_id' => $food->id,
                 'cart_key' => $cartKey,
                 'quantity' => $request->quantity,
-                'selected_variation' => $request->selected_variation,
-                'selected_addons' => $request->selected_addons,
+                'selected_variation' => $verifiedVariation,
+                'selected_addons' => $verifiedAddons,
                 'item_price' => $itemPrice,
             ]);
         }

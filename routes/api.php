@@ -58,13 +58,28 @@ Route::post('/login', function (Request $request) {
         'password' => 'required',
     ]);
 
+    $throttleKey = \Illuminate\Support\Str::transliterate(
+        \Illuminate\Support\Str::lower($request->input('email')) . '|' . $request->ip()
+    );
+
+    if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($throttleKey, 5)) {
+        $seconds = \Illuminate\Support\Facades\RateLimiter::availableIn($throttleKey);
+        return response()->json([
+            'success' => false,
+            'message' => "Too many login attempts. Please try again in {$seconds} seconds.",
+            'retry_after' => $seconds,
+        ], 429);
+    }
+
     if (!Illuminate\Support\Facades\Auth::attempt($request->only('email', 'password'))) {
+        \Illuminate\Support\Facades\RateLimiter::hit($throttleKey, 60);
         return response()->json([
             'success' => false,
             'message' => 'Invalid credentials',
         ], 401);
     }
 
+    \Illuminate\Support\Facades\RateLimiter::clear($throttleKey);
     $request->session()->regenerate();
     $user = Illuminate\Support\Facades\Auth::user();
 
@@ -78,7 +93,7 @@ Route::post('/login', function (Request $request) {
         ],
         'redirect' => '/admin/dashboard',
     ]);
-});
+})->middleware('throttle:5,1');
 
 // Wishlist API Routes
 
