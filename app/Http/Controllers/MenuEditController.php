@@ -17,10 +17,11 @@ class MenuEditController extends Controller
     }
 
     public function menuUpdate(Request $request){
-        $menu = HomeEdit::first();
+        $menu = HomeEdit::where('pages', 'menu')->first();
 
         if(!$menu){
             $menu = new HomeEdit();
+            $menu->pages = 'menu';
         }
 
         $oldContent = $menu->content ?? [];
@@ -49,7 +50,7 @@ class MenuEditController extends Controller
         }
 
         HomeEdit::updateOrCreate(
-            ['pages' => $request->pages],
+            ['pages' => 'menu'],
             ['content' => $menuData]
         );
 

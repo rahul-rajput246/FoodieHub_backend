@@ -16,9 +16,10 @@ class ContactEditController extends Controller
 
     public function contactUpdate(Request $request){
        
-        $contact = HomeEdit::where('pages', $request->pages)->first();
+        $contact = HomeEdit::where('pages', 'contact')->first();
         if(!$contact){
             $contact = new HomeEdit();
+            $contact->pages = 'contact';
         }
 
         $oldContent = $contact->content ?? [];
@@ -99,7 +100,7 @@ class ContactEditController extends Controller
         ];
 
         HomeEdit::updateOrCreate(
-            ['pages' => $request->pages],
+            ['pages' => 'contact'],
             ['content' => $contactData]
         );
 

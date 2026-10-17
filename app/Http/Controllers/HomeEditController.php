@@ -16,12 +16,14 @@ class HomeEditController extends Controller
 
         public function update(Request $request){
 
-            $home = HomeEdit::first();
+            $home = HomeEdit::where('pages', 'home')->first();
 
             if(!$home){
                 $home = new HomeEdit();
+                $home->pages = 'home';
             }
 
+            $oldContent = is_array($home->content) ? $home->content : (json_decode($home->content, true) ?? []);
             $data = $oldContent;
 
             // Home Banner
@@ -38,7 +40,9 @@ class HomeEditController extends Controller
                 'btn_url2' => $request->home_banner_btn_url2,
             ];
 
-            if($request->hasFile('banner_img')){
+            if($request->hasFile('home_banner_img')){
+                $data['home_banner']['image'] = $request->file('home_banner_img')->store('uploads' , 'public');
+            } elseif($request->hasFile('banner_img')){
                 $data['home_banner']['image'] = $request->file('banner_img')->store('uploads' , 'public');
             } else {
                 $data['home_banner']['image'] = $oldContent['home_banner']['image'] ?? null;
@@ -171,12 +175,9 @@ class HomeEditController extends Controller
             ];
 
             HomeEdit::updateOrCreate(
-                ['pages' => $request->pages],
+                ['pages' => 'home'],
                 ['content' => $data]
             );
-            
-            $home->content = $data;
-            $home->save();
 
             return back()->with('success', 'Home page updated successfully');
 
