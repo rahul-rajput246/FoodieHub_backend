@@ -124,7 +124,8 @@
         </li>
         @endif
 
-        {{-- USER ITEMS (Accessible by users, admin gets all details) --}}
+        {{-- USER ITEMS (Only shown to regular users, hidden for admin) --}}
+        @if(Auth::check() && !Auth::user()->hasRole('admin'))
         <li>
             <a href="/orders" class="toggle_class {{ request()->is('orders*') ? 'active' : '' }}">
                 <span class="menu_icon">
@@ -157,6 +158,7 @@
                 <span class="menu_text">Wishlist</span>
             </a>
         </li>
+        @endif
 
         <li>
             <a href="/profile" class="toggle_class {{ request()->is('profile*') || request()->is('user/profile*') || request()->is('user/address*') ? 'active' : '' }}">

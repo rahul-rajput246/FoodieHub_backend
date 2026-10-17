@@ -849,26 +849,58 @@
 }
 
 .page_form_submit_box {
-    margin-top: 25px;
+    position: fixed;
+    bottom: 28px;
+    right: 32px;
+    z-index: 1000;
+    margin: 0;
     display: flex;
     justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    pointer-events: none;
+}
+
+.page_form_submit_box > * {
+    pointer-events: auto;
 }
 
 .save_page_btn {
     border: none;
-    background: #ff7e00;
+    background: linear-gradient(135deg, #ff7e00 0%, #ff5500 100%);
     color: #fff;
-    padding: 14px 24px;
-    border-radius: 12px;
+    padding: 14px 28px;
+    border-radius: 50px;
     font-size: 15px;
-    font-weight: 600;
+    font-weight: 700;
+    letter-spacing: 0.3px;
     cursor: pointer;
-    transition: 0.3s ease;
+    box-shadow: 0 8px 24px rgba(255, 126, 0, 0.42), 0 2px 6px rgba(0, 0, 0, 0.12);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.save_page_btn::before {
+    content: '';
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    background-color: currentColor;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 -960 960 960'%3E%3Cpath d='M840-680v480q0 33-23.5 56.5T760-120H200q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h480l160 160Zm-80 34L646-760H200v560h560v-446ZM480-240q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35ZM240-560h360v-160H240v160Zm-40-86v446-560 114Z'/%3E%3C/svg%3E") no-repeat center / contain;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 -960 960 960'%3E%3Cpath d='M840-680v480q0 33-23.5 56.5T760-120H200q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h480l160 160Zm-80 34L646-760H200v560h560v-446ZM480-240q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35ZM240-560h360v-160H240v160Zm-40-86v446-560 114Z'/%3E%3C/svg%3E") no-repeat center / contain;
 }
 
 .save_page_btn:hover {
-    background: #e56f00;
-    transform: translateY(-2px);
+    background: linear-gradient(135deg, #ff8c1a 0%, #e64a00 100%);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 12px 30px rgba(255, 126, 0, 0.58), 0 4px 10px rgba(0, 0, 0, 0.16);
+}
+
+.save_page_btn:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 14px rgba(255, 126, 0, 0.4);
 }
 
 .btn {
@@ -911,7 +943,7 @@
     min-height: 100%;
     background: #f3f4f6;
     padding: 30px;
-    padding-bottom: 0;
+    padding-bottom: 90px;
 }
 
 .allfood_wrapper {
@@ -1497,11 +1529,15 @@ a.toggle_class {
     }
 
     .page_form_submit_box {
+        bottom: 16px;
+        right: 16px;
+        left: 16px;
         justify-content: stretch;
     }
 
     .save_page_btn {
         width: 100%;
+        justify-content: center;
         padding: 13px 18px;
         font-size: 14px;
     }
