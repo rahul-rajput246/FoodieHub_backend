@@ -9,7 +9,7 @@ use App\Models\FoodCategory;
 class FoodItemsController extends Controller
 {
     public function createFood(){
-        $foods = FoodItems::orderBy('id', 'ASC')->get();
+        $foods = FoodItems::with('category')->orderBy('id', 'ASC')->get();
         $categories = FoodCategory::where('category_status', 1)->orderBy('id', 'ASC')->get();
 
         return view('admin.allFood', compact('foods', 'categories'));
@@ -38,10 +38,12 @@ class FoodItemsController extends Controller
             $data['food_image'] = 'assets/images/' . $imageName;
         }
 
-        $data['food_category'] = $request->food_category;
-        $data['food_is_popular'] = $request->food_is_popular;
-        $data['food_is_featured'] = $request->food_is_featured;
-        $data['food_status'] = $request->food_status;
+        $data['category_id'] = $request->category_id;
+        $data['food_category'] = (bool)($request->food_category ?? false);
+        $data['food_is_popular'] = $request->has('food_is_popular') && $request->food_is_popular !== '' ? (int)$request->food_is_popular : 0;
+        $data['food_is_featured'] = $request->has('food_is_featured') && $request->food_is_featured !== '' ? (int)$request->food_is_featured : 0;
+        $data['food_status'] = $request->has('food_status') && $request->food_status !== '' ? (int)$request->food_status : 1;
+        $data['is_veg'] = ($request->food_type === '1' || strtolower((string)$request->food_type) === 'non_veg') ? false : true;
 
         FoodItems::create($data);
 
@@ -80,6 +82,7 @@ class FoodItemsController extends Controller
             'food_old_price' => 'nullable|numeric',
             'food_rating' => 'nullable|numeric',
             'food_preparation_time' => 'nullable|string|max:100',
+            'category_id' => 'nullable|exists:food_Category,id',
         ]);
 
         if($request->hasFile('food_image')){
@@ -91,10 +94,12 @@ class FoodItemsController extends Controller
             $data['food_image'] = $food->food_image;
         }
 
-        $data['food_category'] = $request->food_category;
-        $data['food_is_popular'] = $request->food_is_popular;
-        $data['food_is_featured'] = $request->food_is_featured;
-        $data['food_status'] = $request->food_status;
+        $data['category_id'] = $request->category_id;
+        $data['food_category'] = (bool)($request->food_category ?? $food->food_category ?? false);
+        $data['food_is_popular'] = $request->has('food_is_popular') && $request->food_is_popular !== '' ? (int)$request->food_is_popular : 0;
+        $data['food_is_featured'] = $request->has('food_is_featured') && $request->food_is_featured !== '' ? (int)$request->food_is_featured : 0;
+        $data['food_status'] = $request->has('food_status') && $request->food_status !== '' ? (int)$request->food_status : 1;
+        $data['is_veg'] = ($request->food_type === '1' || strtolower((string)$request->food_type) === 'non_veg') ? false : true;
 
         $food->update($data);
 

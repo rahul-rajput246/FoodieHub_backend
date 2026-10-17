@@ -67,6 +67,10 @@ class FoodItems extends Model
 
     public function getCategoryNameAttribute()
     {
+        if ($this->category) {
+            return $this->category->category_name;
+        }
+
         $categories = [
             0 => 'Fast Food',
             1 => 'Desi Tadka',
