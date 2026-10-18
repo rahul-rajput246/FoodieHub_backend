@@ -54,6 +54,8 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    'frontend_url' => rtrim(env('FRONTEND_URL', 'https://foodie-hub-alpha.vercel.app'), '/'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

@@ -2,7 +2,7 @@
 
     <!-- LEFT -->
     <div class="admin_logo">
-        <a href="http://localhost:5173">
+        <a href="{{ config('app.frontend_url') }}">
             Foodie<span>Hub</span>
         </a>
     </div>

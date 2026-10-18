@@ -14,7 +14,7 @@
         </div>
 
         <div class="dashboard_header_right" style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <a href="http://localhost:5173/track-order/{{ $order->order_number }}" target="_blank" class="dashboard_top_btn" style="background: linear-gradient(135deg, #ff7e00 0%, #ea580c 100%); display: inline-flex; align-items: center; gap: 6px;">
+            <a href="{{ config('app.frontend_url') }}/track-order/{{ $order->order_number }}" target="_blank" class="dashboard_top_btn" style="background: linear-gradient(135deg, #ff7e00 0%, #ea580c 100%); display: inline-flex; align-items: center; gap: 6px;">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="5.5" cy="17.5" r="3.5"></circle>
                     <circle cx="18.5" cy="17.5" r="3.5"></circle>
@@ -43,7 +43,7 @@
                 Print Receipt
             </a>
             <a href="{{ route('orders.index') }}" class="dashboard_top_btn" style="background: #374151;">← Back to Orders</a>
-            <a href="http://localhost:5173/Menu" class="dashboard_top_btn">+ Order Again</a>
+            <a href="{{ config('app.frontend_url') }}/Menu" class="dashboard_top_btn">+ Order Again</a>
         </div>
     </div>
 
@@ -90,7 +90,7 @@
                     </svg>
                     ETA: {{ $etaMap[$order->status] ?? '25–30 Mins' }}
                 </span>
-                <a href="http://localhost:5173/track-order/{{ $order->order_number }}" target="_blank" style="font-size: 12px; color: #2563eb; text-decoration: underline; font-weight: 600;">
+                <a href="{{ config('app.frontend_url') }}/track-order/{{ $order->order_number }}" target="_blank" style="font-size: 12px; color: #2563eb; text-decoration: underline; font-weight: 600;">
                     Open Full Map View →
                 </a>
             </div>

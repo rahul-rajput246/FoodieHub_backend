@@ -53,11 +53,12 @@ class RegisteredUserController extends Controller
             str_starts_with($redirect, 'http://localhost:5173') ||
             str_starts_with($redirect, 'http://127.0.0.1:5173') ||
             str_starts_with($redirect, 'https://foodie-hub-alpha.vercel.app') ||
+            str_starts_with($redirect, config('app.frontend_url')) ||
             str_starts_with($redirect, '/')
         )) {
             return redirect()->away($redirect);
         }
 
-        return redirect('http://localhost:5173');
+        return redirect(config('app.frontend_url'));
     }
 }

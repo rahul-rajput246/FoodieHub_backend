@@ -12,7 +12,7 @@
         </div>
 
         <div class="dashboard_header_right">
-            <a href="http://localhost:5173/Menu" class="dashboard_top_btn">+ Explore Menu</a>
+            <a href="{{ config('app.frontend_url') }}/Menu" class="dashboard_top_btn">+ Explore Menu</a>
             <a href="/cart" class="dashboard_top_btn" style="background: #374151;">View Cart</a>
         </div>
     </div>
@@ -80,7 +80,7 @@
                 </div>
                 <h3 style="font-size: 18px; color: #111827; margin-bottom: 6px;">Your wishlist is empty</h3>
                 <p style="color: #6b7280; font-size: 14px; margin-bottom: 18px;">Click the heart icon on any food item to save your favorites here!</p>
-                <a href="http://localhost:5173/Menu" class="dashboard_top_btn">Explore Food Menu</a>
+                <a href="{{ config('app.frontend_url') }}/Menu" class="dashboard_top_btn">Explore Food Menu</a>
             </div>
         @endif
     </div>

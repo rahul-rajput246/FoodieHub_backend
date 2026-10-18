@@ -14,7 +14,7 @@
         </div>
 
         <div class="dashboard_header_right">
-            <a href="http://localhost:5173/Menu" class="dashboard_top_btn">+ Order New Food</a>
+            <a href="{{ config('app.frontend_url') }}/Menu" class="dashboard_top_btn">+ Order New Food</a>
             <a href="/admin/dashboard" class="dashboard_top_btn" style="background: #374151;">Dashboard</a>
         </div>
     </div>
@@ -82,7 +82,7 @@
                 <div style="font-size: 36px; margin-bottom: 10px;">📦</div>
                 <h3 style="font-size: 18px; color: #111827; margin-bottom: 6px;">No orders found</h3>
                 <p style="color: #6b7280; font-size: 14px; margin-bottom: 18px;">You have not placed any orders yet. Discover delicious dishes from our menu!</p>
-                <a href="http://localhost:5173/Menu" class="dashboard_top_btn">Browse Menu & Order</a>
+                <a href="{{ config('app.frontend_url') }}/Menu" class="dashboard_top_btn">Browse Menu & Order</a>
             </div>
         @endif
     </div>

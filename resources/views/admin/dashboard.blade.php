@@ -18,7 +18,7 @@
             <div class="dashboard_header_right">
                 <a href="{{ route('admin.create.category') }}" class="dashboard_top_btn">+ Add Category</a>
                 <a href="{{ route('admin.forms.createFood') }}" class="dashboard_top_btn">+ Add Product</a>
-                <a href="http://localhost:5173" class="dashboard_top_btn" style="background: #374151;">Visit Store</a>
+                <a href="{{ config('app.frontend_url') }}" class="dashboard_top_btn" style="background: #374151;">Visit Store</a>
             </div>
         </div>
 
@@ -205,9 +205,9 @@
             </div>
 
             <div class="dashboard_header_right">
-                <a href="http://localhost:5173/Menu" class="dashboard_top_btn" style="background: #ff7e00;">Order Now</a>
+                <a href="{{ config('app.frontend_url') }}/Menu" class="dashboard_top_btn" style="background: #ff7e00;">Order Now</a>
                 <a href="/orders" class="dashboard_top_btn" style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.25);">My Orders</a>
-                <a href="http://localhost:5173" class="dashboard_top_btn" style="background: #374151;">Visit Store</a>
+                <a href="{{ config('app.frontend_url') }}" class="dashboard_top_btn" style="background: #374151;">Visit Store</a>
             </div>
         </div>
 
@@ -266,7 +266,7 @@
         </div>
 
         <div class="dashboard_quick_actions">
-            <a href="http://localhost:5173/Menu">Order Food</a>
+            <a href="{{ config('app.frontend_url') }}/Menu">Order Food</a>
             <a href="/orders">My Orders</a>
             <a href="/cart">My Cart ({{ $userCartCount }})</a>
             <a href="/wishlist">My Wishlist ({{ $userWishlistCount }})</a>
@@ -331,7 +331,7 @@
                                         </div>
                                         <h4 style="font-size: 16px; margin-bottom: 6px;">No orders placed yet</h4>
                                         <p style="color: #6b7280; font-size: 13px; margin-bottom: 16px;">Delicious food is waiting for you! Browse our menu to make your first order.</p>
-                                        <a href="http://localhost:5173/Menu" class="dashboard_top_btn" style="padding: 8px 18px; font-size: 13px;">Explore Menu</a>
+                                        <a href="{{ config('app.frontend_url') }}/Menu" class="dashboard_top_btn" style="padding: 8px 18px; font-size: 13px;">Explore Menu</a>
                                     </td>
                                 </tr>
                             @endforelse
@@ -385,7 +385,7 @@
 
                     <div class="overview_item">
                         <span>Customer Support</span>
-                        <a href="http://localhost:5173/contact" style="color: #ff7e00; font-weight: 600; text-decoration: none;">Contact Us →</a>
+                        <a href="{{ config('app.frontend_url') }}/contact" style="color: #ff7e00; font-weight: 600; text-decoration: none;">Contact Us →</a>
                     </div>
                 </div>
             </div>

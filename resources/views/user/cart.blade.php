@@ -12,7 +12,7 @@
         </div>
 
         <div class="dashboard_header_right">
-            <a href="http://localhost:5173/Menu" class="dashboard_top_btn">+ Add More Food</a>
+            <a href="{{ config('app.frontend_url') }}/Menu" class="dashboard_top_btn">+ Add More Food</a>
             <a href="/admin/dashboard" class="dashboard_top_btn" style="background: #374151;">Dashboard</a>
         </div>
     </div>
@@ -74,7 +74,7 @@
                     <div style="font-size: 36px; margin-bottom: 10px;">🛒</div>
                     <h3 style="font-size: 18px; color: #111827; margin-bottom: 6px;">Your cart is currently empty</h3>
                     <p style="color: #6b7280; font-size: 14px; margin-bottom: 18px;">Browse our menu to add some delicious food to your cart.</p>
-                    <a href="http://localhost:5173/Menu" class="dashboard_top_btn">Browse Menu</a>
+                    <a href="{{ config('app.frontend_url') }}/Menu" class="dashboard_top_btn">Browse Menu</a>
                 </div>
             @endif
         </div>
@@ -102,7 +102,7 @@
 
                 @if($cartItems->count())
                     <div style="margin-top: 20px;">
-                        <a href="http://localhost:5173/cart" class="dashboard_top_btn" style="width: 100%; display: block; text-align: center; padding: 12px 16px; font-size: 15px;">
+                        <a href="{{ config('app.frontend_url') }}/cart" class="dashboard_top_btn" style="width: 100%; display: block; text-align: center; padding: 12px 16px; font-size: 15px;">
                             Proceed To Checkout →
                         </a>
                     </div>

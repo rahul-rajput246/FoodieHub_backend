@@ -17,7 +17,7 @@ use App\Http\Controllers\ContactMessageController;
 use App\Http\Controllers\AdminCouponController;
 
 Route::get('/', function () {
-    return redirect('http://localhost:5173'); 
+    return redirect(config('app.frontend_url')); 
 });
 
 Route::middleware(['auth'])->group(function () {

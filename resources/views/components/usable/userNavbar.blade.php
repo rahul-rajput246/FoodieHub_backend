@@ -3,7 +3,7 @@
 
         <!-- Logo -->
         <div class="logo">
-            <a href="http://localhost:5173">Foodie<span>Hub</span></a>
+            <a href="{{ config('app.frontend_url') }}">Foodie<span>Hub</span></a>
         </div>
 
         <!-- User Section -->
