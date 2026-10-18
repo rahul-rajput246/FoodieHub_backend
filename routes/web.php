@@ -43,6 +43,9 @@ Route::delete('/admin/user/{id}', [DashboardController::class, 'deleteUser'])->n
 Route::get('/admin/allCategory', [FoodCategoryController::class, 'allCategory'])->name('admin.category');
 Route::get('/admin/forms/createCategory', [FoodCategoryController::class, 'addCategory'])->name('admin.create.category');
 Route::post('/admin/forms/store/createCategory', [FoodCategoryController::class, 'updateCategory'])->name('admin.category.update');
+Route::get('/admin/category/{id}/edit', [FoodCategoryController::class, 'editCategory'])->name('admin.category.edit');
+Route::post('/admin/category/{id}/update', [FoodCategoryController::class, 'postEditCategory'])->name('admin.category.postUpdate');
+Route::get('/admin/category/{id}/delete', [FoodCategoryController::class, 'deleteCategory'])->name('admin.category.delete');
 
 // Food Routes
 

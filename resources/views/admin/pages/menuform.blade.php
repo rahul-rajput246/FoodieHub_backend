@@ -21,6 +21,10 @@
 
             <!-- MENU BANNER -->
 
+            @php
+                $banner = $content['menu_banner'] ?? [];
+            @endphp
+
             <div class="main_form_box">
 
             <input type="hidden" name="pages" value="menu">
@@ -34,44 +38,44 @@
 
                     <div class="form_group">
                         <label>Banner Subtitle</label>
-                        <input type="text" name="menu_banner_subtitle" placeholder="Enter banner subtitle" value="{{ old('subtitle', $content['menu_banner']['subtitle']) }}">
+                        <input type="text" name="menu_banner_subtitle" placeholder="Enter banner subtitle" value="{{ old('menu_banner_subtitle', $banner['subtitle'] ?? '') }}">
                     </div>
 
                     <div class="form_group">
                         <label>Banner Title First</label>
                         <input type="text" name="menu_banner_title" placeholder="Enter first title"
-                            value="{{ old('title1', $content['menu_banner']['title1']) }}">
+                            value="{{ old('menu_banner_title', $banner['title1'] ?? '') }}">
                     </div>
 
                     <div class="form_group">
                         <label>Banner Title Second ( color title )</label>
                         <input type="text" name="menu_banner_title_second" placeholder="Enter second title"
-                            value="{{ old('title2', $content['menu_banner']['title2']) }}">
+                            value="{{ old('menu_banner_title_second', $banner['title2'] ?? '') }}">
                     </div>
 
                      <div class="form_group">
                         <label>Banner Title Third</label>
                         <input type="text" name="menu_banner_title_third" placeholder="Enter third title"
-                            value="{{ old('color_title' , $content['menu_banner']['color_title'] ?? '') }}">
+                            value="{{ old('menu_banner_title_third' , $banner['color_title'] ?? '') }}">
                     </div>
 
                     <div class="form_group">
                         <label>Banner Description</label>
                         <textarea name="menu_banner_description" rows="4"
-                            placeholder="Enter banner description">{{ old('desc', $content['menu_banner']['desc']) }}</textarea>
+                            placeholder="Enter banner description">{{ old('menu_banner_description', $banner['desc'] ?? '') }}</textarea>
                     </div>
 
                     <div class="form_row_2">
                         <div class="form_group">
                             <label>Button 1 Text</label>
                             <input type="text" name="menu_banner_btn1_text" placeholder="Enter button 1 text"
-                                value="{{ old('btn_text1', $content['menu_banner']['btn_text1']) }}">
+                                value="{{ old('menu_banner_btn1_text', $banner['btn_text1'] ?? '') }}">
                         </div>
 
                         <div class="form_group">
                             <label>Button 1 Link</label>
                             <input type="text" name="menu_banner_btn1_link" placeholder="/cart"
-                                value="{{ old('btn_url1', $content['menu_banner']['btn_url1']) }}">
+                                value="{{ old('menu_banner_btn1_link', $banner['btn_url1'] ?? '') }}">
                         </div>
                     </div>
 
@@ -79,21 +83,21 @@
                         <div class="form_group">
                             <label>Button 2 Text</label>
                             <input type="text" name="menu_banner_btn2_text" placeholder="Enter button 2 text"
-                                value="{{ old('btn_text2', $content['menu_banner']['btn_text2']) }}">
+                                value="{{ old('menu_banner_btn2_text', $banner['btn_text2'] ?? '') }}">
                         </div>
 
                         <div class="form_group">
                             <label>Button 2 Link</label>
                             <input type="text" name="menu_banner_btn2_link" placeholder="/category"
-                                value="{{ old('btn_url2', $content['menu_banner']['btn_url2']) }}">
+                                value="{{ old('menu_banner_btn2_link', $banner['btn_url2'] ?? '') }}">
                         </div>
                     </div>
 
                     <div class="form_group">
 
-                        @if(!empty($content['menu_banner']['image']))
+                        @if(!empty($banner['image']))
                         <div style="margin-bottom:10px;">
-                            <img src="{{ asset('storage/' . $content['menu_banner']['image'] ?? '') }}" width="120"
+                            <img src="{{ asset('storage/' . $banner['image']) }}" width="120"
                                 height="120" object-fit=contain alt="Menu Banner">
                         </div>
                         @endif

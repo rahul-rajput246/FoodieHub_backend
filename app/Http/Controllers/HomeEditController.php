@@ -8,8 +8,8 @@ use App\Models\HomeEdit;
 class HomeEditController extends Controller
 {
     public function create(){
-        $home = HomeEdit::first();
-        $content = $home->content ?? [];
+        $home = HomeEdit::where('pages', 'home')->first();
+        $content = $home ? (is_array($home->content) ? $home->content : (json_decode($home->content, true) ?: [])) : [];
 
         return view('admin.pages.homeform', compact('home' , 'content'));
     }

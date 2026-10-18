@@ -196,13 +196,10 @@
 
                     
                     @php
-
                     $wcuItems = old('home_wcu_items' , $content['home_wcu']['items'] ?? []);
-
-                    if(count($wcuItems) < 4){
-                        $wcuItems = array_pad($wcuItems,4,['title' => '' , 'desc' => '' , 'icon' => '']);
+                    if(!is_array($wcuItems) || count($wcuItems) < 4){
+                        $wcuItems = array_pad(is_array($wcuItems) ? $wcuItems : [], 4, ['title' => '' , 'desc' => '' , 'icon' => '']);
                     }
-
                     @endphp
 
                     @foreach($wcuItems as $index => $item)
@@ -314,9 +311,9 @@
                     </div>
 
                     @php 
-                        $hiwItems = old('home_hiw_items', $content['home_hiw']['items']);
-                        if(count($hiwItems) < 3){
-                            $hiwItems = array_pad($hiwItems,3,['title' => '' , 'desc' => '', 'icon' => '' , 'step' => '']);
+                        $hiwItems = old('home_hiw_items', $content['home_hiw']['items'] ?? []);
+                        if(!is_array($hiwItems) || count($hiwItems) < 3){
+                            $hiwItems = array_pad(is_array($hiwItems) ? $hiwItems : [], 3, ['title' => '' , 'desc' => '', 'icon' => '' , 'step' => '']);
                         }
                     @endphp
 
@@ -484,12 +481,10 @@
                     </div>
 
                     @php
-
-                        $testomItems = old('home_testom_items', $content['home_testom']['items']);
-                        if(count($testomItems) < 3){
-                            $testomItems = array_pad($testomItems,3,['desc' => '' , 'rating' => '' , 'name' => '' , 'emotion' => '' , 'image' => '']);
+                        $testomItems = old('home_testom_items', $content['home_testom']['items'] ?? []);
+                        if(!is_array($testomItems) || count($testomItems) < 3){
+                            $testomItems = array_pad(is_array($testomItems) ? $testomItems : [], 3, ['desc' => '' , 'rating' => '' , 'name' => '' , 'emotion' => '' , 'image' => '']);
                         }
-
                     @endphp
 
                     @foreach($testomItems as $index => $item)
@@ -614,13 +609,10 @@
                 </div>
 
                 @php 
-                    
-                    $faqItems = old('home_faq_items', $content['home_faq']['items']);
-                    
-                    if(count($faqItems) < 5){
-                        $faqItems = array_pad($faqItems,5,['question' => '' , 'asnwer' => '']);
+                    $faqItems = old('home_faq_items', $content['home_faq']['items'] ?? []);
+                    if(!is_array($faqItems) || count($faqItems) < 5){
+                        $faqItems = array_pad(is_array($faqItems) ? $faqItems : [], 5, ['question' => '' , 'answer' => '']);
                     }
-                    
                 @endphp
 
                 @foreach($faqItems as $index => $item)

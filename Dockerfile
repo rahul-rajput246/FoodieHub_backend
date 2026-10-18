@@ -77,8 +77,9 @@ RUN dos2unix /usr/local/bin/docker-entrypoint.sh \
     && chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Set directory permissions for Laravel
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+RUN mkdir -p /var/www/html/public/assets/images /var/www/html/public/uploads /var/www/html/storage/app/public/uploads \
+    && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public
 
 EXPOSE 80
 

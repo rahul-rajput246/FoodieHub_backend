@@ -81,8 +81,8 @@
                         </td>
                         <td>
                             <div class="action_btn_group">
-                                <a href="#" class="action_btn edit_btn">Edit</a>
-                                <a href="#" class="action_btn delete_btn">Delete</a>
+                                <a href="{{ route('admin.category.edit', $cat->id) }}" class="action_btn edit_btn">Edit</a>
+                                <a href="{{ route('admin.category.delete', $cat->id) }}" class="action_btn delete_btn" onclick="return confirm('Are you sure you want to delete this category?')">Delete</a>
                             </div>
                         </td>
                     </tr>

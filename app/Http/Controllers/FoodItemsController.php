@@ -32,22 +32,27 @@ class FoodItemsController extends Controller
         ]);
 
         if($request->hasFile('food_image')){
+            $uploadDir = public_path('assets/images');
+            if(!file_exists($uploadDir)){
+                @mkdir($uploadDir, 0777, true);
+            }
             $image = $request->file('food_image');
-            $imageName = time() . '_' . $image->getClientOriginalName();
-            $image->move(public_path('assets/images'), $imageName);
+            $imageName = time() . '_' . preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $image->getClientOriginalName());
+            $image->move($uploadDir, $imageName);
             $data['food_image'] = 'assets/images/' . $imageName;
         }
 
-        $data['category_id'] = $request->category_id;
+        $data['category_id'] = $request->filled('category_id') ? $request->category_id : null;
         $data['food_category'] = (bool)($request->food_category ?? false);
-        $data['food_is_popular'] = $request->has('food_is_popular') && $request->food_is_popular !== '' ? (int)$request->food_is_popular : 0;
-        $data['food_is_featured'] = $request->has('food_is_featured') && $request->food_is_featured !== '' ? (int)$request->food_is_featured : 0;
-        $data['food_status'] = $request->has('food_status') && $request->food_status !== '' ? (int)$request->food_status : 1;
+        $data['food_is_popular'] = $request->has('food_is_popular') && $request->food_is_popular !== '' ? (bool)(int)$request->food_is_popular : false;
+        $data['food_is_featured'] = $request->has('food_is_featured') && $request->food_is_featured !== '' ? (bool)(int)$request->food_is_featured : false;
+        $data['food_status'] = $request->has('food_status') && $request->food_status !== '' ? (bool)(int)$request->food_status : true;
         $data['is_veg'] = ($request->food_type === '1' || strtolower((string)$request->food_type) === 'non_veg') ? false : true;
+        $data['food_rating'] = $request->filled('food_rating') ? (float)$request->food_rating : 4.5;
 
         FoodItems::create($data);
 
-        return redirect()->route('admin.allFood')->with('success' , 'food inserted successfully');
+        return redirect()->route('admin.allFood')->with('success' , 'Food item created successfully');
 
     }
 
@@ -86,31 +91,36 @@ class FoodItemsController extends Controller
         ]);
 
         if($request->hasFile('food_image')){
+            $uploadDir = public_path('assets/images');
+            if(!file_exists($uploadDir)){
+                @mkdir($uploadDir, 0777, true);
+            }
             $image = $request->file('food_image');
-            $imageName = time() . '_' . $image->getClientOriginalName();
-            $image->move(public_path('assets/images'), $imageName);
+            $imageName = time() . '_' . preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $image->getClientOriginalName());
+            $image->move($uploadDir, $imageName);
             $data['food_image'] = 'assets/images/' . $imageName;
         } else {
             $data['food_image'] = $food->food_image;
         }
 
-        $data['category_id'] = $request->category_id;
+        $data['category_id'] = $request->filled('category_id') ? $request->category_id : null;
         $data['food_category'] = (bool)($request->food_category ?? $food->food_category ?? false);
-        $data['food_is_popular'] = $request->has('food_is_popular') && $request->food_is_popular !== '' ? (int)$request->food_is_popular : 0;
-        $data['food_is_featured'] = $request->has('food_is_featured') && $request->food_is_featured !== '' ? (int)$request->food_is_featured : 0;
-        $data['food_status'] = $request->has('food_status') && $request->food_status !== '' ? (int)$request->food_status : 1;
+        $data['food_is_popular'] = $request->has('food_is_popular') && $request->food_is_popular !== '' ? (bool)(int)$request->food_is_popular : (bool)$food->food_is_popular;
+        $data['food_is_featured'] = $request->has('food_is_featured') && $request->food_is_featured !== '' ? (bool)(int)$request->food_is_featured : (bool)$food->food_is_featured;
+        $data['food_status'] = $request->has('food_status') && $request->food_status !== '' ? (bool)(int)$request->food_status : (bool)$food->food_status;
         $data['is_veg'] = ($request->food_type === '1' || strtolower((string)$request->food_type) === 'non_veg') ? false : true;
+        $data['food_rating'] = $request->filled('food_rating') ? (float)$request->food_rating : ($food->food_rating ?? 4.5);
 
         $food->update($data);
 
-        return redirect()->route('admin.allFood')->with('success' , 'Update Food Successfully');
+        return redirect()->route('admin.allFood')->with('success' , 'Food item updated successfully');
         
     }
 
     public function deleteFood($id){
         $food = FoodItems::findOrFail($id);
 
-         $food->delete();
+        $food->delete();
 
         return redirect()->route('admin.allFood')->with('success' , 'Food Deleted Successfully');
 

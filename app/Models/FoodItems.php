@@ -83,7 +83,16 @@ class FoodItems extends Model
 
     public function getImageUrlAttribute()
     {
-        return $this->food_image ? asset($this->food_image) : null;
+        if (!$this->food_image) {
+            return null;
+        }
+        if (str_starts_with($this->food_image, 'http://') || str_starts_with($this->food_image, 'https://')) {
+            return $this->food_image;
+        }
+        if (str_starts_with($this->food_image, 'uploads/')) {
+            return asset('storage/' . $this->food_image);
+        }
+        return asset($this->food_image);
     }
 
     public function category()
