@@ -251,7 +251,17 @@ class FoodieHubCustomizationSeeder extends Seeder
             ],
         ];
 
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement("SELECT setval(pg_get_serial_sequence('\"foodItems\"', 'id'), coalesce(max(id), 0) + 1, false) FROM \"foodItems\"");
+        }
+
         foreach ($newDishes as $dish) {
+            $dish['food_category'] = (bool)($dish['food_category'] ?? false);
+            $dish['food_is_popular'] = (bool)($dish['food_is_popular'] ?? false);
+            $dish['food_is_featured'] = (bool)($dish['food_is_featured'] ?? false);
+            $dish['food_status'] = (bool)($dish['food_status'] ?? false);
+            $dish['is_veg'] = (bool)($dish['is_veg'] ?? true);
+
             $existing = FoodItems::where('food_slug', $dish['food_slug'])->first();
             if ($existing) {
                 $existing->update($dish);

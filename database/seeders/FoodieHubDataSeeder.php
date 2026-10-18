@@ -18,7 +18,12 @@ class FoodieHubDataSeeder extends Seeder
         ];
 
         foreach ($categories as $cat) {
+            $cat['category_status'] = (bool)($cat['category_status'] ?? false);
             DB::table('food_Category')->updateOrInsert(['id' => $cat['id']], $cat);
+        }
+
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement("SELECT setval(pg_get_serial_sequence('\"food_Category\"', 'id'), coalesce(max(id), 0) + 1, false) FROM \"food_Category\"");
         }
 
         // 2. Seed Food Items
@@ -236,7 +241,15 @@ class FoodieHubDataSeeder extends Seeder
         ];
 
         foreach ($foodItems as $item) {
+            $item['food_category'] = (bool)($item['food_category'] ?? false);
+            $item['food_is_popular'] = (bool)($item['food_is_popular'] ?? false);
+            $item['food_is_featured'] = (bool)($item['food_is_featured'] ?? false);
+            $item['food_status'] = (bool)($item['food_status'] ?? false);
             DB::table('foodItems')->updateOrInsert(['id' => $item['id']], $item);
+        }
+
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement("SELECT setval(pg_get_serial_sequence('\"foodItems\"', 'id'), coalesce(max(id), 0) + 1, false) FROM \"foodItems\"");
         }
 
         // 3. Seed Home Edit Pages (home, menu, about, contact)
