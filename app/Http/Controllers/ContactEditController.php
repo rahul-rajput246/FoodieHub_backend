@@ -11,7 +11,7 @@ class ContactEditController extends Controller
         $contact = HomeEdit::where('pages' , 'contact')->first();
         $content = $contact->content ?? [];
 
-        return view('admin.pages.contactForm' , compact('contact' , 'content'));
+        return view('admin.pages.contactform' , compact('contact' , 'content'));
     }
 
     public function contactUpdate(Request $request){

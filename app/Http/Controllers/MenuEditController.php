@@ -12,7 +12,7 @@ class MenuEditController extends Controller
         $menu = HomeEdit::where('pages', 'menu')->first();
         $content = $menu->content ?? [];
 
-        return view('admin.pages.menuForm' , compact('menu' , 'content'));
+        return view('admin.pages.menuform' , compact('menu' , 'content'));
 
     }
 
