@@ -26,13 +26,30 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $user->fill($request->validated());
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
         }
 
-        $request->user()->save();
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $uploadDir = public_path('assets/images');
+            if (!file_exists($uploadDir)) {
+                @mkdir($uploadDir, 0777, true);
+            }
+            $storageDir = storage_path('app/public/assets/images');
+            if (!file_exists($storageDir)) {
+                @mkdir($storageDir, 0777, true);
+            }
+            $imageName = time() . '_' . preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $image->getClientOriginalName());
+            $image->move($uploadDir, $imageName);
+            @copy($uploadDir . '/' . $imageName, $storageDir . '/' . $imageName);
+            $user->user_image = 'assets/images/' . $imageName;
+        }
+
+        $user->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }

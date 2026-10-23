@@ -28,6 +28,16 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'user_image',
+    ];
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var list<string>
+     */
+    protected $appends = [
+        'profile_image_url',
     ];
 
     /**
@@ -85,4 +95,54 @@ class User extends Authenticatable
     {
         $this->notify(new \App\Notifications\FoodieHubResetPasswordNotification($token));
     }
+
+    /**
+     * Get the resolved URL for the user's profile image with multiple fallbacks.
+     */
+    public function getProfileImageUrlAttribute(): string
+    {
+        $fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($this->name ?: 'User') . '&background=ff7e00&color=fff';
+
+        if (empty($this->user_image)) {
+            return $fallbackAvatar;
+        }
+
+        // Absolute URL (external or cloud storage)
+        if (str_starts_with($this->user_image, 'http://') || str_starts_with($this->user_image, 'https://')) {
+            return $this->user_image;
+        }
+
+        $cleanPath = ltrim($this->user_image, '/');
+
+        // Check if directly in public/ (e.g. assets/images/... or uploads/...)
+        if (file_exists(public_path($cleanPath))) {
+            return asset($cleanPath);
+        }
+
+        $baseName = basename($cleanPath);
+
+        // Check if in public/assets/images/
+        if (file_exists(public_path('assets/images/' . $baseName))) {
+            return asset('assets/images/' . $baseName);
+        }
+
+        // Check if in public/uploads/
+        if (file_exists(public_path('uploads/' . $baseName))) {
+            return asset('uploads/' . $baseName);
+        }
+
+        // Check in storage/app/public/
+        if (file_exists(storage_path('app/public/' . $cleanPath))) {
+            return asset('storage/' . $cleanPath);
+        }
+
+        // If path begins with storage/
+        if (str_starts_with($cleanPath, 'storage/')) {
+            return asset($cleanPath);
+        }
+
+        // Default to storage asset path which our fallback route will catch if needed
+        return asset('storage/' . $cleanPath);
+    }
 }
+

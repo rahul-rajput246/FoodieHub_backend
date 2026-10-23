@@ -13,18 +13,38 @@ class UserController extends Controller
     {
         $user = auth()->user();
 
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:5120',
+        ]);
+
         $user->name = $request->name;
         $user->email = $request->email;
         
         if($request->hasFile('image')){
-            $image = $request->file('image')->store('assets/images' , 'public');
-            $user->user_image = $image;
+            $image = $request->file('image');
+            $uploadDir = public_path('assets/images');
+            if(!file_exists($uploadDir)){
+                @mkdir($uploadDir, 0777, true);
+            }
+
+            $storageDir = storage_path('app/public/assets/images');
+            if(!file_exists($storageDir)){
+                @mkdir($storageDir, 0777, true);
+            }
+
+            $imageName = time() . '_' . preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $image->getClientOriginalName());
+
+            $image->move($uploadDir, $imageName);
+            @copy($uploadDir . '/' . $imageName, $storageDir . '/' . $imageName);
+
+            $user->user_image = 'assets/images/' . $imageName;
         }
 
         $user->save();
 
         return redirect()->back()->with('success', 'Profile updated successfully.');
-    
     }
 
     public function updatePassword(Request $request)

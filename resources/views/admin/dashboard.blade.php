@@ -345,11 +345,10 @@
                 <div class="small_dashboard_box" style="text-align: center; padding: 25px 20px;">
                     <div style="margin-bottom: 12px;">
                         <img 
-                            src="{{ Auth::user()->user_image 
-                                ? asset('storage/' . Auth::user()->user_image) 
-                                : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=ff7e00&color=fff' }}" 
+                            src="{{ Auth::user()->profile_image_url }}" 
                             alt="{{ Auth::user()->name }}"
                             style="width: 75px; height: 75px; border-radius: 50%; object-fit: cover; border: 3px solid #ff7e00; margin: 0 auto;"
+                            onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=ff7e00&color=fff';"
                         >
                     </div>
 

@@ -7,13 +7,15 @@ sed -i "s/Listen 80/Listen ${PORT}/g" /etc/apache2/ports.conf
 sed -i "s/:80/:${PORT}/g" /etc/apache2/sites-available/*.conf
 
 # Ensure permissions on runtime folders, upload folders, and database
-mkdir -p /var/www/html/public/assets/images /var/www/html/public/uploads /var/www/html/storage/app/public/uploads
+mkdir -p /var/www/html/public/assets/images /var/www/html/public/uploads /var/www/html/storage/app/public/assets/images /var/www/html/storage/app/public/uploads
 touch /var/www/html/database/database.sqlite || true
+
+# Ensure clean storage link exists for public uploads
+rm -rf /var/www/html/public/storage || true
+php artisan storage:link || true
+
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database /var/www/html/public
 chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database /var/www/html/public
-
-# Ensure storage link exists for public uploads
-php artisan storage:link --force || true
 
 # Run database migrations and seeders
 echo "Setting up database tables and initial data..."

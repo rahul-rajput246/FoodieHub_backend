@@ -63,10 +63,10 @@
 
                 <div class="form_group">
                     <label>Profile Image</label>
-                    <input type="file" name="image">
+                    <input type="file" name="image" accept="image/*">
                     @if(Auth::user()->user_image)
                         <div style="margin-top: 10px;">
-                            <img src="{{ asset('storage/' . Auth::user()->user_image) }}" alt="Avatar" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
+                            <img src="{{ Auth::user()->profile_image_url }}" alt="Avatar" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=ff7e00&color=fff';">
                         </div>
                     @endif
                 </div>

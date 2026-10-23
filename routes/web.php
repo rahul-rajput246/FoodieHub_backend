@@ -179,3 +179,52 @@ Route::middleware('auth')->group(function () {
     Route::post('/wishlist/remove/{id}', [WishlistController::class, 'removeFromWishlistPage'])->name('wishlist.remove');
 });
 
+// Production & Docker fallback to serve public storage files reliably
+Route::get('/storage/{path}', function ($path) {
+    // 1. Direct match in storage/app/public/
+    $storageFile = storage_path('app/public/' . $path);
+    if (file_exists($storageFile) && !is_dir($storageFile)) {
+        return response()->file($storageFile);
+    }
+
+    // 2. Direct match in public/
+    $publicFile = public_path($path);
+    if (file_exists($publicFile) && !is_dir($publicFile)) {
+        return response()->file($publicFile);
+    }
+
+    // 3. Basename match in public/assets/images/
+    $baseName = basename($path);
+    $assetFile = public_path('assets/images/' . $baseName);
+    if (file_exists($assetFile) && !is_dir($assetFile)) {
+        return response()->file($assetFile);
+    }
+
+    // 4. Basename match in public/uploads/
+    $uploadFile = public_path('uploads/' . $baseName);
+    if (file_exists($uploadFile) && !is_dir($uploadFile)) {
+        return response()->file($uploadFile);
+    }
+
+    // 5. Basename match in storage/app/public/assets/images/
+    $storageAsset = storage_path('app/public/assets/images/' . $baseName);
+    if (file_exists($storageAsset) && !is_dir($storageAsset)) {
+        return response()->file($storageAsset);
+    }
+
+    // 6. Basename match in storage/app/public/uploads/
+    $storageUpload = storage_path('app/public/uploads/' . $baseName);
+    if (file_exists($storageUpload) && !is_dir($storageUpload)) {
+        return response()->file($storageUpload);
+    }
+
+    // If image extension, fallback to UI avatar
+    if (preg_match('/\.(jpg|jpeg|png|webp|gif|svg|jfif)$/i', $path)) {
+        $name = request()->query('name', 'Admin');
+        return redirect('https://ui-avatars.com/api/?name=' . urlencode($name) . '&background=ff7e00&color=fff');
+    }
+
+    abort(404);
+})->where('path', '.*');
+
+

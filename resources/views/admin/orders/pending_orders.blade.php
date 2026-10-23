@@ -68,9 +68,7 @@
                         <td>
                             <div class="food_list_info">
                                 <div class="food_list_img">
-                                    <img src="{{ $order->user->user_image 
-                                    ? asset('storage/' . $order->user->user_image) 
-                                    : 'https://ui-avatars.com/api/?name=' . urlencode($order->user->name) }}">
+                                    <img src="{{ $order->user ? $order->user->profile_image_url : 'https://ui-avatars.com/api/?name=User&background=ff7e00&color=fff' }}" alt="{{ $order->user->name ?? 'User' }}" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name={{ urlencode($order->user->name ?? 'User') }}&background=ff7e00&color=fff';">
                                 </div>
                                 <div class="food_list_text">
                                     <h4>{{ $order->user->name }}</h4>

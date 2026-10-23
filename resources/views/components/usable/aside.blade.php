@@ -1,7 +1,7 @@
 <div class="admin_sidebar">
     <div class="sidebar_brand">
         <div class="brand_icon">
-            <img src="{{ Auth::check() && Auth::user()->user_image ? asset('storage/' . Auth::user()->user_image) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=ff7e00&color=fff' }}" alt="user">
+            <img src="{{ Auth::check() ? Auth::user()->profile_image_url : 'https://ui-avatars.com/api/?name=User&background=ff7e00&color=fff' }}" alt="user" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name={{ urlencode(Auth::check() ? Auth::user()->name : 'User') }}&background=ff7e00&color=fff';">
         </div>
         <div class="brand_text">
             <h2>FoodieHub</h2>

@@ -13,10 +13,9 @@
                 
                 <!-- Profile Image -->
                 <img 
-                    src="{{ Auth::user()->user_image 
-                        ? asset('storage/' . Auth::user()->user_image) 
-                        : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) }}" 
+                    src="{{ Auth::user()->profile_image_url }}" 
                     alt="user"
+                    onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=ff7e00&color=fff';"
                 >
 
                 <!-- Name -->

@@ -11,7 +11,7 @@
     <div class="right_nav_box">
         <div class="admin_profile">
 
-            <img src="{{ Auth::user()->user_image ? asset('storage/' . Auth::user()->user_image) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name) . '&background=ff7e00&color=fff' }}" alt="{{ Auth::user()->name }}">
+            <img src="{{ Auth::user()->profile_image_url }}" alt="{{ Auth::user()->name }}" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=ff7e00&color=fff';">
 
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center">

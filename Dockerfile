@@ -55,6 +55,11 @@ RUN echo '<Directory /var/www/html/public>\n\
     Options Indexes FollowSymLinks\n\
     AllowOverride All\n\
     Require all granted\n\
+</Directory>\n\
+<Directory /var/www/html>\n\
+    Options Indexes FollowSymLinks\n\
+    AllowOverride All\n\
+    Require all granted\n\
 </Directory>' >> /etc/apache2/apache2.conf
 
 # Install Composer from official composer image
