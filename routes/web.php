@@ -218,9 +218,17 @@ Route::get('/storage/{path}', function ($path) {
         return response()->file($storageUpload);
     }
 
-    // If image extension, fallback to UI avatar
-    if (preg_match('/\.(jpg|jpeg|png|webp|gif|svg|jfif)$/i', $path)) {
-        $name = request()->query('name', 'Admin');
+    // 7. If missing banner image, serve bundled default banner instead of breaking
+    if (str_contains($path, 'banner')) {
+        $defaultBanner = public_path('assets/images/home_banner.png');
+        if (file_exists($defaultBanner) && !is_dir($defaultBanner)) {
+            return response()->file($defaultBanner);
+        }
+    }
+
+    // Only redirect to UI avatar if explicitly requesting a profile/user avatar
+    if (str_starts_with($path, 'profile/') || str_starts_with($path, 'avatars/')) {
+        $name = request()->query('name', 'User');
         return redirect('https://ui-avatars.com/api/?name=' . urlencode($name) . '&background=ff7e00&color=fff');
     }
 

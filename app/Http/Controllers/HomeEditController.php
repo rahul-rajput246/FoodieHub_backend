@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\HomeEdit;
+use App\Helpers\ImageHelper;
 
 class HomeEditController extends Controller
 {
@@ -41,9 +42,9 @@ class HomeEditController extends Controller
             ];
 
             if($request->hasFile('home_banner_img')){
-                $data['home_banner']['image'] = $request->file('home_banner_img')->store('uploads' , 'public');
+                $data['home_banner']['image'] = ImageHelper::processUploadedImage($request->file('home_banner_img'));
             } elseif($request->hasFile('banner_img')){
-                $data['home_banner']['image'] = $request->file('banner_img')->store('uploads' , 'public');
+                $data['home_banner']['image'] = ImageHelper::processUploadedImage($request->file('banner_img'));
             } else {
                 $data['home_banner']['image'] = $oldContent['home_banner']['image'] ?? null;
             }
@@ -110,7 +111,7 @@ class HomeEditController extends Controller
             ];
 
             if($request->hasFile('home_offer_img')){
-                $data['home_specialOffer']['image'] = $request->file('home_offer_img')->store('uploads' , 'public');
+                $data['home_specialOffer']['image'] = ImageHelper::processUploadedImage($request->file('home_offer_img'));
             } else {
                 $data['home_specialOffer']['image'] = $oldContent['home_specialOffer']['image'] ?? null;
             }
@@ -125,7 +126,7 @@ class HomeEditController extends Controller
 
                 if($request->hasFile("home_testom_items.$index.image")){
                     $file = $request->file("home_testom_items.$index.image");
-                    $imagePath = $file->store('uploads', 'public');
+                    $imagePath = ImageHelper::processUploadedImage($file, 'uploads', 600, 75);
                 } else {
                     $imagePath = $item['old_image'] ?? '';
                 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\HomeEdit;
+use App\Helpers\ImageHelper;
 
 class AboutEditController extends Controller
 {
@@ -53,7 +54,7 @@ class AboutEditController extends Controller
         ];
 
         if($request->hasFile('about_banner_image')){
-            $aboutData['about_banner']['image'] = $request->file('about_banner_image')->store('uploads' , 'public');
+            $aboutData['about_banner']['image'] = ImageHelper::processUploadedImage($request->file('about_banner_image'));
         } else {
             $aboutData['about_banner']['image'] = $oldContent['about_banner']['image'] ?? null;
         }
@@ -70,7 +71,7 @@ class AboutEditController extends Controller
         ];
 
         if($request->hasFile('about_our_story_image')){
-            $storyData['image'] = $request->file('about_our_story_image')->store('uploads' , 'public');
+            $storyData['image'] = ImageHelper::processUploadedImage($request->file('about_our_story_image'));
         } else {
             $storyData['image'] = $oldContent['about_our_story']['image'] ?? ($oldContent['About_Our_Story']['image'] ?? null);
         }
@@ -89,7 +90,7 @@ class AboutEditController extends Controller
 
             if($request->hasFile("about_spec_items.$index.image")){
                 $file = $request->file("about_spec_items.$index.image");
-                $imagePath = $file->store('uploads', 'public');
+                $imagePath = ImageHelper::processUploadedImage($file, 'uploads', 800, 75);
             } else {
                 $imagePath = $item['old_image'] ?? '';
             }

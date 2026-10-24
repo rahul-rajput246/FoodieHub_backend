@@ -97,7 +97,7 @@
 
                         @if(!empty($banner['image']))
                         <div style="margin-bottom:10px;">
-                            <img src="{{ asset('storage/' . $banner['image']) }}" width="120"
+                            <img src="{{ imageUrl($banner['image']) }}" width="120"
                                 height="120" object-fit=contain alt="Menu Banner">
                         </div>
                         @endif

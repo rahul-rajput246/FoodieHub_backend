@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\HomeEdit;
+use App\Helpers\ImageHelper;
 
 class ContactEditController extends Controller
 {
@@ -42,7 +43,7 @@ class ContactEditController extends Controller
         ];
 
         if($request->hasFile('contact_banner_image')){
-            $contactData['contact_banner']['image'] = $request->file('contact_banner_image')->store('uploads' , 'public');
+            $contactData['contact_banner']['image'] = ImageHelper::processUploadedImage($request->file('contact_banner_image'));
         } else {
             $contactData['contact_banner']['image'] = $oldContent['contact_banner']['image'] ?? null;
         }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\HomeEdit;
+use App\Helpers\ImageHelper;
 
 class MenuEditController extends Controller
 {
@@ -44,7 +45,7 @@ class MenuEditController extends Controller
         ];
 
         if($request->hasFile('menu_banner_image')){
-            $menuData['menu_banner']['image'] = $request->file('menu_banner_image')->store('uploads' , 'public');
+            $menuData['menu_banner']['image'] = ImageHelper::processUploadedImage($request->file('menu_banner_image'));
         } else {
             $menuData['menu_banner']['image'] = $oldContent['menu_banner']['image'] ?? null;
         }

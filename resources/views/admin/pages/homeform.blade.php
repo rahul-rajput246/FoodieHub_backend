@@ -143,7 +143,7 @@
 
                         @if(!empty($content['home_banner']['image']))
                         <div style="margin-bottom:10px;">
-                            <img src="{{ asset('storage/' . $content['home_banner']['image'] ?? '') }}" width="120"
+                            <img src="{{ imageUrl($content['home_banner']['image'] ?? '') }}" width="120"
                                 height="120" object-fit=contain alt="Home Banner">
                         </div>
                         @endif
@@ -430,7 +430,7 @@
                     <div class="form_group">
                         @if(!empty($content['home_specialOffer']['image']))
                         <div style="margin-bottom:10px;">
-                            <img src="{{ asset('storage/' . $content['home_specialOffer']['image'] ?? '') }}"
+                            <img src="{{ imageUrl($content['home_specialOffer']['image'] ?? '') }}"
                                 width="120" height="120" object-fit=contain alt="Home Offer">
                         </div>
                         @endif
@@ -518,7 +518,7 @@
 
                         <div class="form_group">
                             @if(!empty($item['image']))
-                                <img src="{{ asset('storage/'.$item['image']) }}" width="80">
+                                <img src="{{ imageUrl($item['image']) }}" width="80">
                             @endif
 
                             <input type="file" name="home_testom_items[{{ $index }}][image]">

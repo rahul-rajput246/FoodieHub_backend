@@ -15,7 +15,9 @@ class HomeApiController extends Controller
             return response()->json([
                 'status' => true,
                 'data' => $home
-            ])->header('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+            ])->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+              ->header('Pragma', 'no-cache')
+              ->header('Expires', '0');
         } catch (\Throwable $e) {
             Log::error("Error in homeApi: " . $e->getMessage());
             return response()->json([

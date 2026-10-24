@@ -93,8 +93,8 @@
 
                         @if(!empty($content['contact_banner']['image']))
                         <div style="margin-bottom:10px;">
-                            <img src="{{ asset('storage/' . $content['contact_banner']['image'] ?? '') }}" width="120"
-                                height="120" object-fit=contain alt="About Banner">
+                            <img src="{{ imageUrl($content['contact_banner']['image'] ?? '') }}" width="120"
+                                height="120" object-fit=contain alt="Contact Banner">
                         </div>
                         @endif
 
