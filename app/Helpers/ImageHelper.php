@@ -70,6 +70,48 @@ class ImageHelper
     }
 
     /**
+     * Convert an existing file on disk into an optimized WebP data URI.
+     */
+    public static function fileToDataUri(string $filePath, int $maxWidth = 1200, int $quality = 78): string
+    {
+        if (!file_exists($filePath)) {
+            return '';
+        }
+        $imageContent = @file_get_contents($filePath);
+        if (!$imageContent) {
+            return '';
+        }
+        $gd = @imagecreatefromstring($imageContent);
+        if (!$gd) {
+            return '';
+        }
+        $width = imagesx($gd);
+        $height = imagesy($gd);
+        if ($width > $maxWidth) {
+            $newWidth = $maxWidth;
+            $newHeight = (int) round(($height / $width) * $newWidth);
+            $resized = imagecreatetruecolor($newWidth, $newHeight);
+            imagealphablending($resized, false);
+            imagesavealpha($resized, true);
+            imagecopyresampled($resized, $gd, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+            imagedestroy($gd);
+            $gd = $resized;
+        }
+        ob_start();
+        if (function_exists('imagewebp')) {
+            imagewebp($gd, null, $quality);
+            $compressedData = ob_get_clean();
+            imagedestroy($gd);
+            return 'data:image/webp;base64,' . base64_encode($compressedData);
+        } else {
+            imagejpeg($gd, null, $quality);
+            $compressedData = ob_get_clean();
+            imagedestroy($gd);
+            return 'data:image/jpeg;base64,' . base64_encode($compressedData);
+        }
+    }
+
+    /**
      * Resolve any image (data URI, remote URL, storage upload, or asset) to a valid browser URL.
      */
     public static function url(?string $path, string $fallback = 'assets/images/burger.png'): string

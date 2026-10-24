@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\FoodItems;
 use App\Models\FoodCategory;
+use App\Helpers\ImageHelper;
 
 class FoodItemsController extends Controller
 {
@@ -32,14 +33,7 @@ class FoodItemsController extends Controller
         ]);
 
         if($request->hasFile('food_image')){
-            $uploadDir = public_path('assets/images');
-            if(!file_exists($uploadDir)){
-                @mkdir($uploadDir, 0777, true);
-            }
-            $image = $request->file('food_image');
-            $imageName = time() . '_' . preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $image->getClientOriginalName());
-            $image->move($uploadDir, $imageName);
-            $data['food_image'] = 'assets/images/' . $imageName;
+            $data['food_image'] = ImageHelper::processUploadedImage($request->file('food_image'), 'assets/images', 800, 75);
         }
 
         $data['category_id'] = $request->filled('category_id') ? $request->category_id : null;
@@ -91,14 +85,7 @@ class FoodItemsController extends Controller
         ]);
 
         if($request->hasFile('food_image')){
-            $uploadDir = public_path('assets/images');
-            if(!file_exists($uploadDir)){
-                @mkdir($uploadDir, 0777, true);
-            }
-            $image = $request->file('food_image');
-            $imageName = time() . '_' . preg_replace('/[^a-zA-Z0-9_\.-]/', '_', $image->getClientOriginalName());
-            $image->move($uploadDir, $imageName);
-            $data['food_image'] = 'assets/images/' . $imageName;
+            $data['food_image'] = ImageHelper::processUploadedImage($request->file('food_image'), 'assets/images', 800, 75);
         } else {
             $data['food_image'] = $food->food_image;
         }

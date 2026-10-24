@@ -86,6 +86,9 @@ class FoodItems extends Model
         if (!$this->food_image) {
             return null;
         }
+        if (str_starts_with($this->food_image, 'data:image/')) {
+            return $this->food_image;
+        }
         if (str_starts_with($this->food_image, 'http://') || str_starts_with($this->food_image, 'https://')) {
             return $this->food_image;
         }
